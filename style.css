@@ -126,3 +126,13 @@ h3 { margin: 0; font-size: 16px; letter-spacing: -.25px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* Кнопка управления записью журнала */
+.error-entry { display: flex; align-items: flex-start; gap: 12px; }
+.error-entry-content { flex: 1; min-width: 0; }
+.delete-error { flex: 0 0 auto; padding: 7px 9px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); color: var(--red); font-size: 10px; font-weight: 750; cursor: pointer; }
+.delete-error:active { transform: scale(.97); }
+@media (max-width: 380px) {
+  .error-entry { gap: 8px; }
+  .delete-error { padding: 7px 6px; }
+}
