@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f5f8">
+  <meta name="description" content="Личный ЕГЭ-бустер: слабые темы, ошибки и прогресс. Работает офлайн.">
+  <title>ЕГЭ-бустер</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">Е</div>
+      <div class="brand-copy">
+        <p class="eyebrow">ТВОЯ ПОДГОТОВКА</p>
+        <h1>ЕГЭ-бустер</h1>
+      </div>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Переключить тему" title="Сменить тему">◐</button>
+    </header>
+
+    <main id="main-content">
+      <section class="tab-panel active" id="panel-weak" aria-labelledby="tab-weak">
+        <div class="greeting-row">
+          <div>
+            <p class="eyebrow">ПЛАН НА СЕГОДНЯ</p>
+            <h2>Стань сильнее<br>на один шаг.</h2>
+          </div>
+          <div class="streak-pill" aria-label="Серия дней">
+            <span aria-hidden="true">🔥</span>
+            <strong id="streak-count">1</strong>
+            <small>дн. подряд</small>
+          </div>
+        </div>
+
+        <div class="daily-card">
+          <div class="daily-card-top">
+            <div>
+              <span class="soft-label">Сегодня</span>
+              <h3>Маленький шаг — тоже прогресс</h3>
+            </div>
+            <span class="daily-icon" aria-hidden="true">✦</span>
+          </div>
+          <div class="daily-progress-line">
+            <div class="progress-track"><span id="daily-progress-fill"></span></div>
+            <strong id="daily-progress-text">0 из 5</strong>
+          </div>
+          <button class="text-button" id="complete-task" type="button">Отметить занятие <span aria-hidden="true">↗</span></button>
+        </div>
+
+        <div class="section-heading">
+          <div><p class="eyebrow">ТВОЙ ГЛАВНЫЙ ВЫЗОВ</p><h2>Босс недели</h2></div>
+          <span class="badge">Слабая тема</span>
+        </div>
+        <article class="boss-card" id="boss-card">
+          <div class="boss-top">
+            <div class="boss-avatar" aria-hidden="true">⚔</div>
+            <div class="boss-copy"><span class="soft-label" id="boss-subject">Информатика</span><h3 id="boss-topic">Системы счисления</h3></div>
+            <span class="boss-level" id="boss-level">Ур. 1</span>
+          </div>
+          <div class="boss-stats"><span>Освоение темы</span><strong id="boss-percent">35%</strong></div>
+          <div class="progress-track boss-track"><span id="boss-progress-fill"></span></div>
+          <p class="boss-note" id="boss-note">Побеждай босса, разбирая ошибки и возвращаясь к теме.</p>
+          <button class="primary-button" id="fight-boss" type="button">Сразиться с боссом <span aria-hidden="true">→</span></button>
+        </article>
+
+        <div class="section-heading topics-heading">
+          <div><p class="eyebrow">ЧТО ПОВТОРИТЬ</p><h2>Слабые темы</h2></div>
+          <span class="count-badge" id="topic-count">3 темы</span>
+        </div>
+        <div class="topic-list" id="topic-list" aria-live="polite"></div>
+
+        <div class="section-heading errors-heading">
+          <div><p class="eyebrow">НЕ ТЕРЯЙ БАЛЛЫ ДВАЖДЫ</p><h2>Добавить ошибку</h2></div>
+        </div>
+        <form class="error-form" id="error-form">
+          <label>Предмет
+            <select id="error-subject" required>
+              <option value="Информатика">Информатика</option>
+              <option value="Русский язык">Русский язык</option>
+              <option value="Математика">Математика</option>
+            </select>
+          </label>
+          <label>Тема
+            <input id="error-topic" type="text" list="topic-suggestions" placeholder="Например, системы счисления" maxlength="80" required>
+            <datalist id="topic-suggestions"></datalist>
+          </label>
+          <div class="form-row">
+            <label>Номер задания
+              <input id="error-task" type="number" min="1" max="99" inputmode="numeric" placeholder="Например, 7">
+            </label>
+            <label>Причина ошибки
+              <select id="error-reason">
+                <option value="Не понял тему">Не понял тему</option>
+                <option value="Невнимательность">Невнимательность</option>
+                <option value="Не хватило времени">Не хватило времени</option>
+                <option value="Забыл правило">Забыл правило</option>
+              </select>
+            </label>
+          </div>
+          <label>Комментарий <span class="optional">(необязательно)</span>
+            <textarea id="error-comment" rows="2" maxlength="240" placeholder="Что нужно запомнить?"></textarea>
+          </label>
+          <button class="primary-button" type="submit">Сохранить ошибку <span aria-hidden="true">＋</span></button>
+          <p class="form-hint">После сохранения прогресс темы немного снизится — так будет видно, что повторить.</p>
+        </form>
+
+        <section class="recent-errors" id="recent-errors-section" hidden>
+          <div class="section-heading"><div><p class="eyebrow">ПОСЛЕДНИЕ ЗАПИСИ</p><h2>Журнал ошибок</h2></div></div>
+          <div id="recent-errors"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel placeholder-panel" id="panel-training" aria-labelledby="tab-training" hidden>
+        <div class="placeholder-icon">◎</div><p class="eyebrow">РЕЖИМ ПРАКТИКИ</p><h2>Тренинг</h2>
+        <p>Здесь появятся короткие тренировки по темам ЕГЭ, подборки заданий и разборы ошибок.</p><span class="coming-soon">Скоро</span>
+      </section>
+      <section class="tab-panel placeholder-panel" id="panel-cards" aria-labelledby="tab-cards" hidden>
+        <div class="placeholder-icon">▤</div><p class="eyebrow">ПОВТОРЯЙ ПО ЧУТЬ-ЧУТЬ</p><h2>Карточки</h2>
+        <p>Здесь будут карточки для запоминания правил, формул и алгоритмов.</p><span class="coming-soon">Скоро</span>
+      </section>
+      <section class="tab-panel placeholder-panel" id="panel-progress" aria-labelledby="tab-progress" hidden>
+        <div class="placeholder-icon">↗</div><p class="eyebrow">ТВОЙ РОСТ</p><h2>Прогресс</h2>
+        <p>Статистика занятий, динамика освоения тем и история подготовки появятся здесь.</p><span class="coming-soon">Скоро</span>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Основная навигация">
+      <button class="nav-item active" id="tab-weak" type="button" data-tab="weak" aria-current="page"><span class="nav-icon">◈</span><span>Слабые</span></button>
+      <button class="nav-item" id="tab-training" type="button" data-tab="training"><span class="nav-icon">◎</span><span>Тренинг</span></button>
+      <button class="nav-item" id="tab-cards" type="button" data-tab="cards"><span class="nav-icon">▤</span><span>Карточки</span></button>
+      <button class="nav-item" id="tab-progress" type="button" data-tab="progress"><span class="nav-icon">↗</span><span>Прогресс</span></button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
