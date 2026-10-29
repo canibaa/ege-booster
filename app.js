@@ -278,7 +278,7 @@
       if (error.createdTopic && linkedTopic.errors <= 1) {
         data.topics = data.topics.filter((topic) => topic.id !== linkedTopic.id);
       } else {
-        linkedTopic.mastery = Math.min(100, clamp(linkedTopic.mastery) + 5);
+        linkedTopic.mastery = Math.min(100, clamp(linkedTopic.mastery) + (Number(error.masteryDelta) || 5));
         linkedTopic.errors = Math.max(0, (Number(linkedTopic.errors) || 0) - 1);
       }
     }
@@ -329,6 +329,7 @@
       id: "error-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6),
       topicId: existing.id,
       createdTopic,
+      masteryDelta: 5,
       subject,
       topic: title,
       task: $("#error-task").value.trim(),
@@ -441,7 +442,7 @@
     if (!topic) { topic={id:"practice-"+q.id,subject:q.subject,title:q.topic,mastery:correct?55:40,errors:correct?0:1}; data.topics.push(topic); }
     else { topic.mastery=clamp(topic.mastery+(correct?2:-3)); if (!correct) topic.errors=(Number(topic.errors)||0)+1; }
     if (!correct) {
-      data.errors.push({id:"quiz-error-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6),topicId:topic.id,createdTopic:false,subject:q.subject,topic:q.topic,task:"",reason:"Ошибка в тренировке",comment:q.q+" Правильный ответ: "+q.options[q.answer],date:new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"})});
+      data.errors.push({id:"quiz-error-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6),topicId:topic.id,createdTopic:false,subject:q.subject,topic:q.topic,task:"",reason:"Ошибка в тренировке",masteryDelta:3,comment:q.q+" Правильный ответ: "+q.options[q.answer],date:new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"})});
       if (data.errors.length>100) data.errors=data.errors.slice(-100);
     }
     saveData(); renderTopics(); renderErrors(); renderQuestion();
