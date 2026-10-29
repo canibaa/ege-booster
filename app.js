@@ -172,16 +172,19 @@
       return;
     }
     section.hidden = false;
-    container.innerHTML = [...data.errors].slice(-4).reverse().map((error) => {
+    container.innerHTML = [...data.errors].reverse().map((error) => {
       const details = [
         error.task ? "Задание №" + escapeHtml(error.task) : "",
         escapeHtml(error.reason || ""),
         error.comment ? escapeHtml(error.comment) : ""
       ].filter(Boolean).join(" · ");
       return `<article class="error-entry">
-        <strong>${escapeHtml(error.topic)} <span style="font-weight:500;color:var(--muted)">· ${escapeHtml(error.subject)}</span></strong>
-        <p>${details || "Ошибка сохранена для повторения."}</p>
-        <small>${escapeHtml(error.date || "")}</small>
+        <div class="error-entry-content">
+          <strong>${escapeHtml(error.topic)} <span style="font-weight:500;color:var(--muted)">· ${escapeHtml(error.subject)}</span></strong>
+          <p>${details || "Ошибка сохранена для повторения."}</p>
+          <small>${escapeHtml(error.date || "")}</small>
+        </div>
+        <button class="delete-error" type="button" data-delete-error="${escapeHtml(error.id || "")}" aria-label="Убрать ошибку ${escapeHtml(error.topic)}">Убрать</button>
       </article>`;
     }).join("");
   }
@@ -252,6 +255,32 @@
     showToast("Запиши ошибку по теме «" + boss.title + "» — начни с этого босса.");
   });
 
+  $("#recent-errors").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-delete-error]");
+    if (!button) return;
+    const errorIndex = data.errors.findIndex((item) => String(item.id || "") === button.dataset.deleteError);
+    if (errorIndex < 0) return;
+    const error = data.errors[errorIndex];
+    if (!window.confirm("Убрать запись об ошибке «" + error.topic + "»?")) return;
+
+    const linkedTopic = data.topics.find((topic) =>
+      (error.topicId && topic.id === error.topicId) ||
+      (!error.topicId && topic.subject === error.subject && topic.title.toLocaleLowerCase("ru") === String(error.topic).toLocaleLowerCase("ru"))
+    );
+    if (linkedTopic) {
+      if (error.createdTopic && linkedTopic.errors <= 1) {
+        data.topics = data.topics.filter((topic) => topic.id !== linkedTopic.id);
+      } else {
+        linkedTopic.mastery = Math.min(100, clamp(linkedTopic.mastery) + 5);
+        linkedTopic.errors = Math.max(0, (Number(linkedTopic.errors) || 0) - 1);
+      }
+    }
+    data.errors.splice(errorIndex, 1);
+    saveData();
+    renderAll();
+    showToast("Запись убрана.");
+  });
+
   $("#topic-list").addEventListener("click", (event) => {
     const button = event.target.closest("[data-delete-topic]");
     if (!button) return;
@@ -272,22 +301,27 @@
       $("#error-topic").focus();
       return;
     }
-    const existing = data.topics.find((topic) => topic.title.toLocaleLowerCase("ru") === title.toLocaleLowerCase("ru") && topic.subject === subject);
+    let existing = data.topics.find((topic) => topic.title.toLocaleLowerCase("ru") === title.toLocaleLowerCase("ru") && topic.subject === subject);
+    let createdTopic = false;
     if (existing) {
       existing.mastery = Math.max(0, clamp(existing.mastery) - 5);
       existing.errors = (Number(existing.errors) || 0) + 1;
     } else {
-      data.topics.push({
+      existing = {
         id: "topic-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7),
         subject,
         title,
         mastery: 45,
         errors: 1
-      });
+      };
+      data.topics.push(existing);
+      createdTopic = true;
     }
 
     data.errors.push({
-      id: "error-" + Date.now().toString(36),
+      id: "error-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6),
+      topicId: existing.id,
+      createdTopic,
       subject,
       topic: title,
       task: $("#error-task").value.trim(),
