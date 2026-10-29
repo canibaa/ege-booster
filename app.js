@@ -396,7 +396,7 @@
     {id:"fc15",subject:"Русский язык",topic:"Типы речи",front:"Три основных типа речи?",back:"Повествование — события; описание — признаки; рассуждение — тезис, аргументы, вывод."},
     {id:"fc16",subject:"Информатика",topic:"Алгоритмы",front:"Что такое линейный поиск?",back:"Последовательная проверка элементов до нахождения нужного или до конца коллекции."}
   ];
-  let activeQuiz = null, activeQuestionIndex = 0, activeQuizAnswers = [], currentCardId = null;
+  let activeQuiz = null, activeQuestionIndex = 0, activeQuizAnswers = [], currentCardId = null, cardOffset = 0;
 
   function shuffle(items) {
     const result = [...items];
@@ -476,6 +476,7 @@
     let cards=flashcards.filter((card)=>subject==="all"||card.subject===subject);
     if (mode==="new") cards=cards.filter((card)=>!data.cardProgress[card.id]||!data.cardProgress[card.id].seen);
     if (mode==="due") cards=cards.filter((card)=>!data.cardProgress[card.id]||!data.cardProgress[card.id].due||data.cardProgress[card.id].due<=localDateKey());
+    if (mode==="all" && cards.length) { const offset=cardOffset%cards.length; cards=cards.slice(offset).concat(cards.slice(0,offset)); }
     if (!cards.length) {
       currentCardId=null; wrap.innerHTML='<div class="flashcard empty-card"><span class="soft-label">Колода пройдена</span><h3>'+(mode==="due"?"На сегодня всё!":"Карточек нет")+'</h3><p>'+(mode==="due"?'Можно выбрать режим «Все карточки».':"Выбери другой предмет или режим.")+'</p></div>';
       $("#flashcard-actions").hidden=true; updateCardCounter(); return;
@@ -493,6 +494,7 @@
     const previous=data.cardProgress[currentCardId]||{}, days=known?Math.min(30,Math.max(1,(previous.interval||0)+1)):0, due=new Date();
     due.setDate(due.getDate()+days);
     data.cardProgress[currentCardId]={seen:true,known:known,interval:days,due:localDateKey(due)};
+    if ($("#cards-mode").value==="all") cardOffset+=1;
     saveData(); renderProgress(); renderCard(); showToast(known?"Карточка отмечена как знакомая.":"Карточка вернётся в повторение.");
   }
   function exportData() {
