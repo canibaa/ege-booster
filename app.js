@@ -532,6 +532,98 @@
   $("#import-data").addEventListener("change",(event)=>{const file=event.target.files&&event.target.files[0];if(file)importData(file);});
 
 
+
+  // Отдельный тренажёр Полины: ответы и история сохраняются в localStorage.
+  const polinaTasks = [{"id":"po1","topic":"Орфография","prompt":"Вставь пропущенные буквы и запиши предложение целиком.","text":"По весе…ей дороге мы вышли к зарос…ему пруду.","answer":"По весенней дороге мы вышли к заросшему пруду.","explain":"«Весенней» пишется с НН? Нет: весенний — прилагательное с суффиксом -енн-, поэтому НН. «Заросшему» — форма причастия от зарос, пишется одна С в корне: заросший."},{"id":"po2","topic":"Орфография","prompt":"Исправь орфографические ошибки. Перепиши предложение целиком.","text":"Не смотря на усталость, он продолжал идти по безлюдной улице.","answer":"Несмотря на усталость, он продолжал идти по безлюдной улице.","explain":"«Несмотря на» в значении уступки (= хотя) — производный предлог, пишется слитно. Сравни: не смотря по сторонам — деепричастие, раздельно."},{"id":"po3","topic":"Орфография","prompt":"Вставь Н или НН и запиши предложение целиком.","text":"На столе лежала жаре…ая рыба, а рядом — решё…ая задача.","answer":"На столе лежала жареная рыба, а рядом — решённая задача.","explain":"«Жареная» без приставки и зависимых слов — отглагольное прилагательное с одной Н. «Решённая» — полное страдательное причастие совершенного вида, пишется НН."},{"id":"po4","topic":"Пунктуация","prompt":"Расставь знаки препинания. Запиши предложение целиком.","text":"Когда закончился урок мы вышли в коридор и встретили учителя который спешил на совещание.","answer":"Когда закончился урок, мы вышли в коридор и встретили учителя, который спешил на совещание.","explain":"Запятая после придаточной времени «Когда закончился урок» отделяет её от главной части. Запятая перед «который» отделяет придаточную определительную."},{"id":"po5","topic":"Пунктуация","prompt":"Расставь знаки препинания в предложении с вводным словом.","text":"К счастью дождь закончился и мы успели на автобус.","answer":"К счастью, дождь закончился, и мы успели на автобус.","explain":"«К счастью» — вводное сочетание, выделяется запятой. Перед «и» нужна запятая между частями сложного предложения: дождь закончился, и мы успели."},{"id":"po6","topic":"Пунктуация","prompt":"Найди границы частей сложного предложения и расставь знаки.","text":"Я понял что ошибся но исправить ответ уже не успел.","answer":"Я понял, что ошибся, но исправить ответ уже не успел.","explain":"Придаточная часть «что ошибся» отделяется запятой. Перед противительным союзом «но» ставится запятая между частями сложного предложения."},{"id":"po7","topic":"Орфография","prompt":"Выбери правильное написание, вставив буквы в оба слова.","text":"пр…клонить ветку; пр…терпеть неудобства","answer":"приклонить ветку; претерпеть неудобства","explain":"ПРИ- в слове «приклонить» обозначает неполноту действия/приближение к наклону. ПРЕ- в «претерпеть» близко по смыслу к «перенести, выдержать»."},{"id":"po8","topic":"Пунктуация","prompt":"Расставь знаки препинания и сохрани смысл предложения.","text":"Солнце уже село однако на улице было ещё светло.","answer":"Солнце уже село, однако на улице было ещё светло.","explain":"«Однако» здесь противительный союз (= но), соединяет части сложного предложения, поэтому перед ним ставится запятая."}];
+  if (!Array.isArray(data.polinaAttempts)) data.polinaAttempts = [];
+  let activePolinaTasks = [];
+  function normalizePolinaAnswer(value) {
+    return String(value || "").toLocaleLowerCase("ru").replace(/ё/g, "е").replace(/\\s+/g, " ").trim().replace(/\\s*([,.;:!?])\\s*/g, "$1");
+  }
+  function renderPolinaHistory() {
+    const el = $("#polina-history");
+    if (!el) return;
+    const attempts = data.polinaAttempts || [];
+    el.innerHTML = attempts.length ? attempts.slice(0,10).map((item) => '<article class="polina-attempt"><div><strong>' + escapeHtml(item.date) + '</strong><small>' + item.total + ' заданий · ошибок: ' + item.mistakes + '</small></div><b>' + item.score + '/' + item.total + '</b></article>').join("") : '<div class="empty-state">Здесь появятся результаты занятий Полины.</div>';
+    const summary = $("#polina-summary");
+    if (attempts.length) {
+      const last = attempts[0];
+      summary.innerHTML = '<strong>Последний результат: ' + last.score + ' из ' + last.total + '</strong><span>' + (last.mistakes ? 'Ошибок для разбора: ' + last.mistakes + '. Скопируйте отчёт ниже и отправьте его в чат.' : 'В этой попытке ошибок нет. Отличная работа!') + '</span>';
+    }
+  }
+  function renderPolinaTasks() {
+    const area = $("#polina-quiz");
+    if (!activePolinaTasks.length) { area.innerHTML = ""; return; }
+    area.innerHTML = activePolinaTasks.map((task, index) => {
+      const result = task.result;
+      return '<article class="polina-task"><div class="polina-task-top"><span>' + escapeHtml(task.topic) + '</span><span>Задание ' + (index + 1) + ' из ' + activePolinaTasks.length + '</span></div><p>' + escapeHtml(task.prompt) + '</p><h3>' + escapeHtml(task.text) + '</h3><textarea id="polina-answer-' + task.id + '" aria-label="Ответ на задание ' + (index + 1) + '" placeholder="Введи исправленное предложение..." ' + (result ? 'disabled' : '') + '>' + escapeHtml(result ? result.userAnswer : '') + '</textarea>' +
+      (result ? '<div class="polina-feedback ' + (result.correct ? 'good' : 'bad') + '"><strong>' + (result.correct ? 'Верно ✓' : 'Есть ошибка') + '</strong><p><b>Правильный вариант:</b> ' + escapeHtml(task.answer) + '</p><p><b>Разбор:</b> ' + escapeHtml(task.explain) + '</p></div>' : '<button class="primary-button polina-check" type="button" data-polina-check="' + task.id + '">Проверить ответ</button>') + '</article>';
+    }).join("");
+  }
+  function startPolina() {
+    const topic = $("#polina-topic").value, countValue = $("#polina-count").value;
+    let available = polinaTasks.filter((task) => topic === "all" || task.topic === topic);
+    available = shuffle(available);
+    const count = countValue === "all" ? available.length : Math.min(Number(countValue), available.length);
+    activePolinaTasks = available.slice(0, count).map((task) => ({...task, result: null}));
+    renderPolinaTasks();
+    $("#polina-summary").innerHTML = '<strong>Задания начались</strong><span>Не спеши: исправляй предложение целиком. После проверки появится объяснение правила.</span>';
+    $("#polina-quiz").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function checkPolinaAnswer(taskId) {
+    const task = activePolinaTasks.find((item) => item.id === taskId);
+    if (!task || task.result) return;
+    const input = $("#polina-answer-" + taskId);
+    const userAnswer = input.value.trim();
+    if (!userAnswer) { input.focus(); showToast("Сначала впиши свой вариант ответа."); return; }
+    const correct = normalizePolinaAnswer(userAnswer) === normalizePolinaAnswer(task.answer);
+    task.result = {userAnswer, correct, date: new Date().toLocaleString("ru-RU")};
+    saveData();
+    renderPolinaTasks();
+    const done = activePolinaTasks.filter((item) => item.result).length;
+    if (done === activePolinaTasks.length) {
+      const score = activePolinaTasks.filter((item) => item.result.correct).length;
+      const mistakes = activePolinaTasks.filter((item) => !item.result.correct).length;
+      data.polinaAttempts.unshift({
+        id: "polina-" + Date.now().toString(36), date: new Date().toLocaleString("ru-RU"),
+        total: activePolinaTasks.length, score, mistakes,
+        answers: activePolinaTasks.map((item) => ({id:item.id,topic:item.topic,prompt:item.prompt,text:item.text,userAnswer:item.result.userAnswer,correct:item.result.correct,answer:item.answer,explain:item.explain}))
+      });
+      data.polinaAttempts = data.polinaAttempts.slice(0,50);
+      saveData(); renderPolinaHistory();
+      showToast("Результат Полины сохранён.");
+    } else {
+      showToast(correct ? "Верно. Переходите к следующему заданию." : "Ответ сохранён. Посмотрите разбор ниже.");
+    }
+  }
+  function buildPolinaReport() {
+    const attempts = data.polinaAttempts || [];
+    if (!attempts.length) return "Полина — ЕГЭ по русскому языку. Пока нет сохранённых попыток.";
+    return "ОТЧЁТ ПОЛИНЫ — ЕГЭ ПО РУССКОМУ ЯЗЫКУ\\n" + attempts.slice(0,10).map((attempt) => {
+      return "\\nДата: " + attempt.date + " | Результат: " + attempt.score + "/" + attempt.total + "\\n" + attempt.answers.map((item, index) => (index+1) + ". Тема: " + item.topic + "\\nЗадание: " + item.text + "\\nОтвет Полины: " + item.userAnswer + "\\nРезультат: " + (item.correct ? "верно" : "ошибка") + "\\nПравильный вариант: " + item.answer + "\\nПравило: " + item.explain).join("\\n");
+    }).join("\\n\\n");
+  }
+  $("#polina-start").addEventListener("click", startPolina);
+  $("#polina-quiz").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-polina-check]");
+    if (button) checkPolinaAnswer(button.dataset.polinaCheck);
+  });
+  $("#polina-copy-report").addEventListener("click", async () => {
+    const report = buildPolinaReport();
+    try { await navigator.clipboard.writeText(report); showToast("Отчёт скопирован. Вставь его сюда в чат."); }
+    catch (error) {
+      const area = document.createElement("textarea"); area.value = report; document.body.appendChild(area); area.select();
+      const copied = document.execCommand("copy"); area.remove();
+      showToast(copied ? "Отчёт скопирован. Вставь его сюда в чат." : "Не удалось скопировать — скачай отчёт.");
+    }
+  });
+  $("#polina-download-report").addEventListener("click", () => {
+    const blob = new Blob([buildPolinaReport()], {type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob), link = document.createElement("a");
+    link.href = url; link.download = "polina-ege-otchet-" + localDateKey() + ".txt";
+    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+  });
+
   const savedTheme = localStorage.getItem(THEME_KEY);
   const preferredTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   applyTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : preferredTheme);
@@ -540,6 +632,7 @@
   renderQuizHistory();
   renderCard();
   renderProgress();
+  renderPolinaHistory();
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     window.addEventListener("load", () => {
