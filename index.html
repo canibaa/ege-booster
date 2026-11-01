@@ -126,6 +126,16 @@
   <div class="flashcard-wrap" id="flashcard-wrap"><div class="flashcard empty-card"><span class="soft-label">Твоя колода</span><h3>Карточки ждут</h3><p>Выбери предмет и режим повторения.</p></div></div>
   <div class="flashcard-actions" id="flashcard-actions" hidden><button class="secondary-button" id="reveal-card" type="button">Показать ответ</button><div class="rating-actions" id="rating-actions" hidden><button class="rate-again" id="rate-again" type="button">Не помню</button><button class="rate-known" id="rate-known" type="button">Знаю ✓</button></div></div><div class="card-counter" id="card-counter">Карточек изучено: 0</div>
 </section>
+      <section class="tab-panel study-panel" id="panel-polina" aria-labelledby="nav-polina" hidden>
+  <div class="page-intro"><p class="eyebrow">РУССКИЙ ЯЗЫК · ЕГЭ</p><h2>Полина</h2><p>Небольшие задания на орфографию и пунктуацию. Введи исправленный вариант целиком: ответы и ошибки сохраняются в этом браузере.</p></div>
+  <div class="polina-summary" id="polina-summary"><strong>Начинаем спокойно</strong><span>Сначала попробуйте 6 заданий. После проверки можно разобрать каждую ошибку.</span></div>
+  <div class="polina-controls"><label>Тема<select id="polina-topic"><option value="all">Орфография и пунктуация</option><option value="Орфография">Орфография</option><option value="Пунктуация">Пунктуация</option></select></label><label>Заданий<select id="polina-count"><option value="4">4 задания</option><option value="6" selected>6 заданий</option><option value="all">Все задания</option></select></label></div>
+  <button class="primary-button" id="polina-start" type="button">Начать задания →</button>
+  <div id="polina-quiz" class="polina-quiz" aria-live="polite"></div>
+  <div class="section-heading polina-history-heading"><div><p class="eyebrow">СОХРАНЁННЫЕ ПОПЫТКИ</p><h2>История Полины</h2></div></div>
+  <div id="polina-history" class="polina-history"></div>
+  <div class="backup-card polina-report-card"><h3>Отчёт для разбора</h3><p>Собери ошибки в удобный текст и отправь его в этот чат. Я разберу правила, объясню каждую ошибку и составлю упражнения именно по слабым местам.</p><div class="backup-actions"><button class="secondary-button" id="polina-copy-report" type="button">Скопировать отчёт</button><button class="secondary-button" id="polina-download-report" type="button">Скачать отчёт</button></div><p class="form-hint">Попытки сохраняются локально на этом устройстве. Чтобы данные появились на другом телефоне, понадобится экспорт/передача отчёта.</p></div>
+</section>
       <section class="tab-panel study-panel" id="panel-progress" aria-labelledby="nav-progress" hidden>
   <div class="page-intro"><p class="eyebrow">ТВОЙ РОСТ</p><h2>Прогресс</h2><p>Здесь собраны результаты тренировок и то, что стоит подтянуть дальше.</p></div>
   <div class="stats-grid"><article class="stat-card"><span>Решено заданий</span><strong id="stat-answered">0</strong><small>за всё время</small></article><article class="stat-card"><span>Точность</span><strong id="stat-accuracy">—</strong><small>правильных ответов</small></article><article class="stat-card"><span>Тренировок</span><strong id="stat-quizzes">0</strong><small>завершено</small></article><article class="stat-card"><span>Карточек знаю</span><strong id="stat-cards">0</strong><small>отмечено «Знаю»</small></article></div>
@@ -141,6 +151,7 @@
       <button class="nav-item" id="nav-training" type="button" data-tab="training"><span class="nav-icon">◎</span><span>Тренинг</span></button>
       <button class="nav-item" id="nav-cards" type="button" data-tab="cards"><span class="nav-icon">▤</span><span>Карточки</span></button>
       <button class="nav-item" id="nav-progress" type="button" data-tab="progress"><span class="nav-icon">↗</span><span>Прогресс</span></button>
+      <button class="nav-item" id="nav-polina" type="button" data-tab="polina"><span class="nav-icon">А</span><span>Полина</span></button>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
