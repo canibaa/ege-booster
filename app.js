@@ -538,7 +538,7 @@
   if (!Array.isArray(data.polinaAttempts)) data.polinaAttempts = [];
   let activePolinaTasks = [];
   function normalizePolinaAnswer(value) {
-    return String(value || "").toLocaleLowerCase("ru").replace(/ё/g, "е").replace(/\\s+/g, " ").trim().replace(/\\s*([,.;:!?])\\s*/g, "$1");
+    return String(value || "").toLocaleLowerCase("ru").replace(/ё/g, "е").replace(/\s+/g, " ").trim().replace(/\s*([,.;:!?])\s*/g, "$1");
   }
   function renderPolinaHistory() {
     const el = $("#polina-history");
@@ -599,9 +599,9 @@
   function buildPolinaReport() {
     const attempts = data.polinaAttempts || [];
     if (!attempts.length) return "Полина — ЕГЭ по русскому языку. Пока нет сохранённых попыток.";
-    return "ОТЧЁТ ПОЛИНЫ — ЕГЭ ПО РУССКОМУ ЯЗЫКУ\\n" + attempts.slice(0,10).map((attempt) => {
-      return "\\nДата: " + attempt.date + " | Результат: " + attempt.score + "/" + attempt.total + "\\n" + attempt.answers.map((item, index) => (index+1) + ". Тема: " + item.topic + "\\nЗадание: " + item.text + "\\nОтвет Полины: " + item.userAnswer + "\\nРезультат: " + (item.correct ? "верно" : "ошибка") + "\\nПравильный вариант: " + item.answer + "\\nПравило: " + item.explain).join("\\n");
-    }).join("\\n\\n");
+    return "ОТЧЁТ ПОЛИНЫ — ЕГЭ ПО РУССКОМУ ЯЗЫКУ\n" + attempts.slice(0,10).map((attempt) => {
+      return "\nДата: " + attempt.date + " | Результат: " + attempt.score + "/" + attempt.total + "\n" + attempt.answers.map((item, index) => (index+1) + ". Тема: " + item.topic + "\nЗадание: " + item.text + "\nОтвет Полины: " + item.userAnswer + "\nРезультат: " + (item.correct ? "верно" : "ошибка") + "\nПравильный вариант: " + item.answer + "\nПравило: " + item.explain).join("\n");
+    }).join("\n\n");
   }
   $("#polina-start").addEventListener("click", startPolina);
   $("#polina-quiz").addEventListener("click", (event) => {
