@@ -3,6 +3,10 @@
 
   const STORAGE_KEY = "ege-booster-data-v1";
   const THEME_KEY = "ege-booster-theme-v1";
+  const SUPABASE_URL = "https://hszdojpseepejhycsvdc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_0QRczS54rnbgxkcUSrHdbA_IAOr-0iU";
+  const cloud = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+  let cloudSaveTimer = null;
   const DAILY_GOAL = 5;
   const $ = (selector) => document.querySelector(selector);
 
@@ -66,6 +70,7 @@
   function saveData() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      scheduleCloudSave();
     } catch (error) {
       showToast("Не получилось сохранить данные на устройстве.");
       console.error("Ошибка localStorage:", error);
@@ -533,96 +538,95 @@
 
 
 
-  // Отдельный тренажёр Полины: ответы и история сохраняются в localStorage.
-  const polinaTasks = [{"id":"po1","topic":"Орфография","prompt":"Вставь пропущенные буквы и запиши предложение целиком.","text":"По весе…ей дороге мы вышли к зарос…ему пруду.","answer":"По весенней дороге мы вышли к заросшему пруду.","explain":"«Весенней» пишется с НН? Нет: весенний — прилагательное с суффиксом -енн-, поэтому НН. «Заросшему» — форма причастия от зарос, пишется одна С в корне: заросший."},{"id":"po2","topic":"Орфография","prompt":"Исправь орфографические ошибки. Перепиши предложение целиком.","text":"Не смотря на усталость, он продолжал идти по безлюдной улице.","answer":"Несмотря на усталость, он продолжал идти по безлюдной улице.","explain":"«Несмотря на» в значении уступки (= хотя) — производный предлог, пишется слитно. Сравни: не смотря по сторонам — деепричастие, раздельно."},{"id":"po3","topic":"Орфография","prompt":"Вставь Н или НН и запиши предложение целиком.","text":"На столе лежала жаре…ая рыба, а рядом — решё…ая задача.","answer":"На столе лежала жареная рыба, а рядом — решённая задача.","explain":"«Жареная» без приставки и зависимых слов — отглагольное прилагательное с одной Н. «Решённая» — полное страдательное причастие совершенного вида, пишется НН."},{"id":"po4","topic":"Пунктуация","prompt":"Расставь знаки препинания. Запиши предложение целиком.","text":"Когда закончился урок мы вышли в коридор и встретили учителя который спешил на совещание.","answer":"Когда закончился урок, мы вышли в коридор и встретили учителя, который спешил на совещание.","explain":"Запятая после придаточной времени «Когда закончился урок» отделяет её от главной части. Запятая перед «который» отделяет придаточную определительную."},{"id":"po5","topic":"Пунктуация","prompt":"Расставь знаки препинания в предложении с вводным словом.","text":"К счастью дождь закончился и мы успели на автобус.","answer":"К счастью, дождь закончился, и мы успели на автобус.","explain":"«К счастью» — вводное сочетание, выделяется запятой. Перед «и» нужна запятая между частями сложного предложения: дождь закончился, и мы успели."},{"id":"po6","topic":"Пунктуация","prompt":"Найди границы частей сложного предложения и расставь знаки.","text":"Я понял что ошибся но исправить ответ уже не успел.","answer":"Я понял, что ошибся, но исправить ответ уже не успел.","explain":"Придаточная часть «что ошибся» отделяется запятой. Перед противительным союзом «но» ставится запятая между частями сложного предложения."},{"id":"po7","topic":"Орфография","prompt":"Выбери правильное написание, вставив буквы в оба слова.","text":"пр…клонить ветку; пр…терпеть неудобства","answer":"приклонить ветку; претерпеть неудобства","explain":"ПРИ- в слове «приклонить» обозначает неполноту действия/приближение к наклону. ПРЕ- в «претерпеть» близко по смыслу к «перенести, выдержать»."},{"id":"po8","topic":"Пунктуация","prompt":"Расставь знаки препинания и сохрани смысл предложения.","text":"Солнце уже село однако на улице было ещё светло.","answer":"Солнце уже село, однако на улице было ещё светло.","explain":"«Однако» здесь противительный союз (= но), соединяет части сложного предложения, поэтому перед ним ставится запятая."}];
-  if (!Array.isArray(data.polinaAttempts)) data.polinaAttempts = [];
-  let activePolinaTasks = [];
-  function normalizePolinaAnswer(value) {
-    return String(value || "").toLocaleLowerCase("ru").replace(/ё/g, "е").replace(/\s+/g, " ").trim().replace(/\s*([,.;:!?])\s*/g, "$1");
+
+  function cloudStatus(message, isError=false) {
+    const el=$("#cloud-status");
+    if(el){el.textContent=message;el.dataset.error=isError?"true":"false";}
   }
-  function renderPolinaHistory() {
-    const el = $("#polina-history");
-    if (!el) return;
-    const attempts = data.polinaAttempts || [];
-    el.innerHTML = attempts.length ? attempts.slice(0,10).map((item) => '<article class="polina-attempt"><div><strong>' + escapeHtml(item.date) + '</strong><small>' + item.total + ' заданий · ошибок: ' + item.mistakes + '</small></div><b>' + item.score + '/' + item.total + '</b></article>').join("") : '<div class="empty-state">Здесь появятся результаты занятий Полины.</div>';
-    const summary = $("#polina-summary");
-    if (attempts.length) {
-      const last = attempts[0];
-      summary.innerHTML = '<strong>Последний результат: ' + last.score + ' из ' + last.total + '</strong><span>' + (last.mistakes ? 'Ошибок для разбора: ' + last.mistakes + '. Скопируйте отчёт ниже и отправьте его в чат.' : 'В этой попытке ошибок нет. Отличная работа!') + '</span>';
-    }
+  function leaderboardPoints(progress) {
+    const answers=Array.isArray(progress.answers)?progress.answers:[];
+    const correct=answers.filter(item=>item&&item.correct).length;
+    const quizzes=Array.isArray(progress.quizHistory)?progress.quizHistory.length:0;
+    const cards=progress.cardProgress&&typeof progress.cardProgress==="object"?Object.values(progress.cardProgress).filter(item=>item&&item.known).length:0;
+    return correct*10+quizzes*5+cards*2;
   }
-  function renderPolinaTasks() {
-    const area = $("#polina-quiz");
-    if (!activePolinaTasks.length) { area.innerHTML = ""; return; }
-    area.innerHTML = activePolinaTasks.map((task, index) => {
-      const result = task.result;
-      return '<article class="polina-task"><div class="polina-task-top"><span>' + escapeHtml(task.topic) + '</span><span>Задание ' + (index + 1) + ' из ' + activePolinaTasks.length + '</span></div><p>' + escapeHtml(task.prompt) + '</p><h3>' + escapeHtml(task.text) + '</h3><textarea id="polina-answer-' + task.id + '" aria-label="Ответ на задание ' + (index + 1) + '" placeholder="Введи исправленное предложение..." ' + (result ? 'disabled' : '') + '>' + escapeHtml(result ? result.userAnswer : '') + '</textarea>' +
-      (result ? '<div class="polina-feedback ' + (result.correct ? 'good' : 'bad') + '"><strong>' + (result.correct ? 'Верно ✓' : 'Есть ошибка') + '</strong><p><b>Правильный вариант:</b> ' + escapeHtml(task.answer) + '</p><p><b>Разбор:</b> ' + escapeHtml(task.explain) + '</p></div>' : '<button class="primary-button polina-check" type="button" data-polina-check="' + task.id + '">Проверить ответ</button>') + '</article>';
-    }).join("");
+  function scheduleCloudSave() {
+    if(!cloud)return;
+    window.clearTimeout(cloudSaveTimer);
+    cloudSaveTimer=window.setTimeout(()=>saveCloudProgress(),1000);
   }
-  function startPolina() {
-    const topic = $("#polina-topic").value, countValue = $("#polina-count").value;
-    let available = polinaTasks.filter((task) => topic === "all" || task.topic === topic);
-    available = shuffle(available);
-    const count = countValue === "all" ? available.length : Math.min(Number(countValue), available.length);
-    activePolinaTasks = available.slice(0, count).map((task) => ({...task, result: null}));
-    renderPolinaTasks();
-    $("#polina-summary").innerHTML = '<strong>Задания начались</strong><span>Не спеши: исправляй предложение целиком. После проверки появится объяснение правила.</span>';
-    $("#polina-quiz").scrollIntoView({behavior:"smooth",block:"start"});
+  async function ensureCloudProfile(user) {
+    const username=String(user.user_metadata&&user.user_metadata.username||"").trim();
+    if(!username)return;
+    const {error}=await cloud.from("profiles").upsert({id:user.id,username,updated_at:new Date().toISOString()},{onConflict:"id"});
+    if(error)throw error;
   }
-  function checkPolinaAnswer(taskId) {
-    const task = activePolinaTasks.find((item) => item.id === taskId);
-    if (!task || task.result) return;
-    const input = $("#polina-answer-" + taskId);
-    const userAnswer = input.value.trim();
-    if (!userAnswer) { input.focus(); showToast("Сначала впиши свой вариант ответа."); return; }
-    const correct = normalizePolinaAnswer(userAnswer) === normalizePolinaAnswer(task.answer);
-    task.result = {userAnswer, correct, date: new Date().toLocaleString("ru-RU")};
-    saveData();
-    renderPolinaTasks();
-    const done = activePolinaTasks.filter((item) => item.result).length;
-    if (done === activePolinaTasks.length) {
-      const score = activePolinaTasks.filter((item) => item.result.correct).length;
-      const mistakes = activePolinaTasks.filter((item) => !item.result.correct).length;
-      data.polinaAttempts.unshift({
-        id: "polina-" + Date.now().toString(36), date: new Date().toLocaleString("ru-RU"),
-        total: activePolinaTasks.length, score, mistakes,
-        answers: activePolinaTasks.map((item) => ({id:item.id,topic:item.topic,prompt:item.prompt,text:item.text,userAnswer:item.result.userAnswer,correct:item.result.correct,answer:item.answer,explain:item.explain}))
-      });
-      data.polinaAttempts = data.polinaAttempts.slice(0,50);
-      saveData(); renderPolinaHistory();
-      showToast("Результат Полины сохранён.");
-    } else {
-      showToast(correct ? "Верно. Переходите к следующему заданию." : "Ответ сохранён. Посмотрите разбор ниже.");
-    }
+  async function saveCloudProgress() {
+    if(!cloud)return;
+    const {data:sd}=await cloud.auth.getSession(), user=sd&&sd.session&&sd.session.user;
+    if(!user)return;
+    try{
+      await ensureCloudProfile(user);
+      const {error}=await cloud.from("user_progress").upsert({user_id:user.id,progress:data,points:leaderboardPoints(data),updated_at:new Date().toISOString()},{onConflict:"user_id"});
+      if(error)throw error;
+      cloudStatus("Синхронизировано · "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}));
+      await renderLeaderboard();
+    }catch(error){console.error("Cloud save:",error);cloudStatus("Ошибка синхронизации: "+(error.message||"проверь настройки Supabase"),true);}
   }
-  function buildPolinaReport() {
-    const attempts = data.polinaAttempts || [];
-    if (!attempts.length) return "Полина — ЕГЭ по русскому языку. Пока нет сохранённых попыток.";
-    return "ОТЧЁТ ПОЛИНЫ — ЕГЭ ПО РУССКОМУ ЯЗЫКУ\n" + attempts.slice(0,10).map((attempt) => {
-      return "\nДата: " + attempt.date + " | Результат: " + attempt.score + "/" + attempt.total + "\n" + attempt.answers.map((item, index) => (index+1) + ". Тема: " + item.topic + "\nЗадание: " + item.text + "\nОтвет Полины: " + item.userAnswer + "\nРезультат: " + (item.correct ? "верно" : "ошибка") + "\nПравильный вариант: " + item.answer + "\nПравило: " + item.explain).join("\n");
-    }).join("\n\n");
+  async function loadCloudProgress() {
+    const {data:sd}=await cloud.auth.getSession(),user=sd&&sd.session&&sd.session.user;
+    if(!user)return;
+    try{
+      await ensureCloudProfile(user);
+      const {data:remote,error}=await cloud.from("user_progress").select("progress").eq("user_id",user.id).maybeSingle();
+      if(error)throw error;
+      if(remote&&remote.progress&&Array.isArray(remote.progress.topics)&&Array.isArray(remote.progress.errors)){
+        const localCount=(data.answers||[]).length,remoteCount=(remote.progress.answers||[]).length;
+        if(remoteCount>=localCount){data={...freshData(),...remote.progress};localStorage.setItem(STORAGE_KEY,JSON.stringify(data));renderAll();renderQuizHistory();renderCard();renderProgress();cloudStatus("Облачный прогресс загружен");}
+        else await saveCloudProgress();
+      }else await saveCloudProgress();
+    }catch(error){console.error("Cloud load:",error);cloudStatus("Не удалось загрузить прогресс: "+(error.message||"ошибка"),true);}
   }
-  $("#polina-start").addEventListener("click", startPolina);
-  $("#polina-quiz").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-polina-check]");
-    if (button) checkPolinaAnswer(button.dataset.polinaCheck);
+  async function renderLeaderboard() {
+    const el=$("#leaderboard-list");if(!el||!cloud)return;
+    const {data:sd}=await cloud.auth.getSession();
+    if(!sd.session){el.innerHTML='<div class="empty-state">Войди в аккаунт, чтобы увидеть общий рейтинг.</div>';return;}
+    const {data:rows,error}=await cloud.rpc("get_leaderboard",{limit_count:50});
+    if(error){el.innerHTML='<div class="empty-state">Не удалось загрузить рейтинг: '+escapeHtml(error.message)+'</div>';return;}
+    el.innerHTML=rows&&rows.length?rows.map((row,index)=>'<article class="leader-row"><span class="leader-place">'+(index+1)+'</span><strong>'+escapeHtml(row.username)+'</strong><b>'+Number(row.points||0)+' очков</b></article>').join(""):'<div class="empty-state">Пока никто не набрал очки. Начни первым.</div>';
+  }
+  async function refreshAccountUI() {
+    if(!cloud){cloudStatus("Не удалось загрузить клиент Supabase",true);return;}
+    const {data:sd}=await cloud.auth.getSession(),user=sd.session&&sd.session.user;
+    $("#auth-form").hidden=!!user;$("#logout-button").hidden=!user;
+    $("#account-user").textContent=user?(user.user_metadata.username||user.email||"Аккаунт"):"Не выполнен вход";
+    if(user){cloudStatus("Аккаунт подключён");await loadCloudProgress();}
+    await renderLeaderboard();
+  }
+  $("#auth-form").addEventListener("submit",async event=>{
+    event.preventDefault();
+    if(!cloud){cloudStatus("Supabase не загрузился. Проверь интернет.",true);return;}
+    const username=$("#auth-username").value.trim(),email=$("#auth-email").value.trim(),password=$("#auth-password").value,mode=$("#auth-mode").value;
+    if(mode==="signup"&&!/^[A-Za-zА-Яа-яЁё0-9_-]{3,20}$/.test(username)){cloudStatus("Ник: 3–20 символов, буквы, цифры, _ или -.",true);return;}
+    cloudStatus("Подключаем аккаунт…");
+    try{
+      if(mode==="signup"){
+        const {data:result,error}=await cloud.auth.signUp({email,password,options:{data:{username}}});
+        if(error)throw error;
+        if(result.session){await ensureCloudProfile(result.user);await saveCloudProgress();cloudStatus("Аккаунт создан и подключён");}
+        else cloudStatus("Проверь почту и подтверди регистрацию, затем войди.");
+      }else{
+        const {error}=await cloud.auth.signInWithPassword({email,password});if(error)throw error;await refreshAccountUI();
+      }
+      $("#auth-password").value="";
+    }catch(error){cloudStatus(error.message||"Ошибка авторизации",true);}
   });
-  $("#polina-copy-report").addEventListener("click", async () => {
-    const report = buildPolinaReport();
-    try { await navigator.clipboard.writeText(report); showToast("Отчёт скопирован. Вставь его сюда в чат."); }
-    catch (error) {
-      const area = document.createElement("textarea"); area.value = report; document.body.appendChild(area); area.select();
-      const copied = document.execCommand("copy"); area.remove();
-      showToast(copied ? "Отчёт скопирован. Вставь его сюда в чат." : "Не удалось скопировать — скачай отчёт.");
-    }
+  $("#auth-mode").addEventListener("change",()=>{
+    const signup=$("#auth-mode").value==="signup";$("#auth-username-label").hidden=!signup;$("#auth-submit").textContent=signup?"Создать аккаунт":"Войти";
   });
-  $("#polina-download-report").addEventListener("click", () => {
-    const blob = new Blob([buildPolinaReport()], {type:"text/plain;charset=utf-8"});
-    const url = URL.createObjectURL(blob), link = document.createElement("a");
-    link.href = url; link.download = "polina-ege-otchet-" + localDateKey() + ".txt";
-    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
-  });
+  $("#logout-button").addEventListener("click",async()=>{if(!cloud)return;await cloud.auth.signOut();cloudStatus("Вы вышли из аккаунта");await refreshAccountUI();});
+  $("#refresh-leaderboard").addEventListener("click",renderLeaderboard);
+  if(cloud)cloud.auth.onAuthStateChange((event)=>{if(event==="SIGNED_IN"||event==="TOKEN_REFRESHED"||event==="SIGNED_OUT")refreshAccountUI();});
 
   const savedTheme = localStorage.getItem(THEME_KEY);
   const preferredTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -632,7 +636,7 @@
   renderQuizHistory();
   renderCard();
   renderProgress();
-  renderPolinaHistory();
+  refreshAccountUI();
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     window.addEventListener("load", () => {
