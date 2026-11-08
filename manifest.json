@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "ЕГЭ-бустер",
-  "short_name": "ЕГЭ-бустер",
-  "description": "Личный помощник для подготовки к ЕГЭ. Слабые темы, ошибки и ежедневный прогресс.",
+  "name": "ЕГЭ LAB — подготовка к экзаменам",
+  "short_name": "ЕГЭ LAB",
+  "description": "Ежедневная подготовка к ЕГЭ: русский язык, профильная математика и информатика.",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",
@@ -10,7 +10,10 @@
   "orientation": "portrait",
   "background_color": "#f4f5f8",
   "theme_color": "#6256e8",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.svg",
