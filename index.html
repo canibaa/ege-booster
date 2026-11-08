@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4f5f8">
-  <meta name="description" content="Личный ЕГЭ-бустер: слабые темы, ошибки и прогресс. Работает офлайн.">
-  <title>ЕГЭ-бустер</title>
+  <meta name="description" content="ЕГЭ LAB — ежедневная подготовка по русскому языку, профильной математике и информатике.">
+  <title>ЕГЭ LAB — подготовка к экзаменам</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./style.css">
@@ -13,28 +13,18 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand-mark" aria-hidden="true">Е</div>
-      <div class="brand-copy">
-        <p class="eyebrow">ТВОЯ ПОДГОТОВКА</p>
-        <h1>ЕГЭ-бустер</h1>
-      </div>
+      <div class="brand-mark" aria-hidden="true">E.</div>
+      <div class="brand-copy"><p class="eyebrow">ПЛАТФОРМА ПОДГОТОВКИ</p><h1>ЕГЭ LAB</h1></div>
+      <div class="topbar-meta">2027 · твой темп</div>
       <button class="icon-button" id="theme-toggle" type="button" aria-label="Переключить тему" title="Сменить тему">◐</button>
     </header>
 
     <main id="main-content">
       <section class="tab-panel active" id="panel-weak" aria-labelledby="tab-weak">
-        <div class="greeting-row">
-          <div>
-            <p class="eyebrow">ПЛАН НА СЕГОДНЯ</p>
-            <h2>Стань сильнее<br>на один шаг.</h2>
-          </div>
-          <div class="streak-pill" aria-label="Серия дней">
-            <span aria-hidden="true">🔥</span>
-            <strong id="streak-count">1</strong>
-            <small>дн. подряд</small>
-          </div>
+<div class="greeting-row">
+          <div><p class="eyebrow">ТВОЯ ПОДГОТОВКА · 2027</p><h2>Не зубри всё.<br>Разбирайся в системе.</h2><p class="hero-subtitle">Три предмета. Понятный маршрут. Видимый прогресс.</p></div>
+          <div class="streak-pill"><span>🔥</span><strong id="streak-count">1</strong><small>дн. подряд</small></div>
         </div>
-
         <div class="daily-card">
           <div class="daily-card-top">
             <div>
@@ -113,6 +103,38 @@
         </section>
       </section>
 
+<section class="tab-panel study-panel" id="panel-daily" aria-labelledby="nav-daily" hidden>
+  <div class="page-intro"><p class="eyebrow">ЕЖЕДНЕВНЫЙ МАРШРУТ</p><h2>Три задания.<br>Каждый день.</h2><p>По одному заданию на каждый предмет. Набор обновляется по календарной дате. Решай самостоятельно, затем смотри разбор.</p></div>
+  <div class="daily-challenge-head"><span id="daily-date-label">СЕГОДНЯ</span><strong id="daily-challenge-count">0 / 3 выполнено</strong></div>
+  <div class="daily-challenge-list" id="daily-challenge-list"></div>
+  <div class="daily-note"><strong>Как это работает</strong><p>Задания выбираются из учебной базы приложения. После ответа результат попадёт в общую статистику и синхронизируется с аккаунтом.</p></div>
+</section>
+<section class="tab-panel study-panel" id="panel-guide" aria-labelledby="nav-guide" hidden>
+  <div class="page-intro"><p class="eyebrow">БАЗА ЗНАНИЙ</p><h2>Справочник ЕГЭ</h2><p>Краткие правила, формулы и алгоритмы. Используй как шпаргалку для понимания, а не вместо решения заданий.</p></div>
+  <div class="guide-warning"><strong>Важно про актуальность</strong><p>Структура экзамена и формулировки заданий могут меняться. Перед экзаменом сверяйся с официальными демоверсиями, спецификациями и кодификаторами ФИПИ на нужный год. Материалы ниже — учебная база, не официальный документ.</p></div>
+  <div class="guide-filter"><button class="guide-filter-btn active" data-guide-filter="all">Все</button><button class="guide-filter-btn" data-guide-filter="Русский язык">Русский</button><button class="guide-filter-btn" data-guide-filter="Математика">Математика</button><button class="guide-filter-btn" data-guide-filter="Информатика">Информатика</button></div>
+  <div class="guide-list" id="guide-list">
+    <details class="guide-card" data-guide-subject="Русский язык" open><summary><span class="guide-tag">РУССКИЙ ЯЗЫК</span><strong>Н и НН в разных частях речи</strong></summary><div class="guide-body"><h4>Алгоритм</h4><ol><li>Определи часть речи.</li><li>В прилагательных от существительных проверь суффиксы -ан-, -ян-, -ин- (обычно одна Н; исключения: стеклянный, оловянный, деревянный).</li><li>В отглагольных прилагательных проверь приставку, зависимые слова и вид глагола.</li><li>В полных страдательных причастиях обычно НН; в кратких причастиях — одна Н.</li></ol><p><b>Пример:</b> крашеная стена, но крашенная мастером стена; решённая задача, задача решена.</p><p class="guide-tip">Не применяй один признак ко всем словам: сначала установи часть речи.</p></div></details>
+    <details class="guide-card" data-guide-subject="Русский язык"><summary><span class="guide-tag">РУССКИЙ ЯЗЫК</span><strong>Запятые в сложном предложении</strong></summary><div class="guide-body"><h4>Алгоритм</h4><ol><li>Найди грамматические основы.</li><li>Определи границы частей и средство связи.</li><li>Проверь, нет ли общего второстепенного члена, общей придаточной части или других условий, влияющих на запятую.</li><li>Проверь однородные члены и вводные конструкции отдельно.</li></ol><p><b>Пример:</b> Когда стемнело, мы вернулись домой. Я знал, что он придёт.</p></div></details>
+    <details class="guide-card" data-guide-subject="Русский язык"><summary><span class="guide-tag">РУССКИЙ ЯЗЫК</span><strong>Средства выразительности</strong></summary><div class="guide-body"><ul><li><b>Метафора</b> — перенос по сходству: «море огней».</li><li><b>Метонимия</b> — перенос по смежности: «прочитал Пушкина».</li><li><b>Эпитет</b> — образное определение.</li><li><b>Сравнение</b> — сопоставление, часто с «как», «словно», «будто».</li><li><b>Гипербола</b> — намеренное преувеличение.</li><li><b>Литота</b> — намеренное преуменьшение.</li></ul></div></details>
+    <details class="guide-card" data-guide-subject="Математика" open><summary><span class="guide-tag">ПРОФИЛЬНАЯ МАТЕМАТИКА</span><strong>Производная и исследование функции</strong></summary><div class="guide-body"><h4>Базовые формулы</h4><ul><li>(xⁿ)' = n·xⁿ⁻¹</li><li>(C)' = 0</li><li>(f ± g)' = f' ± g'</li><li>(fg)' = f'g + fg'</li><li>(f/g)' = (f'g − fg') / g²</li></ul><h4>Алгоритм исследования</h4><ol><li>Найди область определения.</li><li>Вычисли производную.</li><li>Найди критические точки: f'(x)=0 или производная не существует.</li><li>Определи знаки производной на промежутках.</li><li>Сделай вывод о возрастании, убывании и экстремумах.</li></ol><p><b>Пример:</b> f(x)=x³, f'(x)=3x².</p></div></details>
+    <details class="guide-card" data-guide-subject="Математика"><summary><span class="guide-tag">ПРОФИЛЬНАЯ МАТЕМАТИКА</span><strong>Тригонометрия: основные значения</strong></summary><div class="guide-body"><table class="guide-table"><tr><th>Угол</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr><tr><td>sin</td><td>0</td><td>1/2</td><td>√2/2</td><td>√3/2</td><td>1</td></tr><tr><td>cos</td><td>1</td><td>√3/2</td><td>√2/2</td><td>1/2</td><td>0</td></tr></table><p>Главное тождество: sin²x + cos²x = 1.</p><p>Периодичность: sin(x+2π)=sin x; cos(x+2π)=cos x.</p></div></details>
+    <details class="guide-card" data-guide-subject="Математика"><summary><span class="guide-tag">ПРОФИЛЬНАЯ МАТЕМАТИКА</span><strong>Вероятность</strong></summary><div class="guide-body"><ul><li>Классическая вероятность: P(A)=m/n, если все исходы равновозможны.</li><li>Противоположное событие: P(не A)=1−P(A).</li><li>Независимые события: P(A∩B)=P(A)·P(B).</li><li>Несовместные события: P(A∪B)=P(A)+P(B).</li></ul><p><b>Пример:</b> 3 красных и 2 синих шара. Вероятность красного: 3/5.</p></div></details>
+    <details class="guide-card" data-guide-subject="Информатика" open><summary><span class="guide-tag">ИНФОРМАТИКА</span><strong>Системы счисления</strong></summary><div class="guide-body"><p>Позиционная запись числа: сумма цифр, умноженных на степени основания системы.</p><p><b>Пример:</b> 1011₂ = 1·2³ + 0·2² + 1·2¹ + 1·2⁰ = 11₁₀.</p><h4>Перевод из десятичной в другую систему</h4><ol><li>Делить число на основание системы.</li><li>Записывать остатки.</li><li>Читать остатки снизу вверх.</li></ol></div></details>
+    <details class="guide-card" data-guide-subject="Информатика"><summary><span class="guide-tag">ИНФОРМАТИКА</span><strong>Логические операции</strong></summary><div class="guide-body"><ul><li><b>НЕ (not)</b> — меняет значение на противоположное.</li><li><b>И (and)</b> — истина, только если истинны оба выражения.</li><li><b>ИЛИ (or)</b> — истина, если истинно хотя бы одно выражение.</li><li><b>Импликация A→B</b> ложна только при A=1 и B=0.</li></ul><p>Приоритет в Python: not, затем and, затем or. Используй скобки, если порядок может быть неочевиден.</p></div></details>
+    <details class="guide-card" data-guide-subject="Информатика"><summary><span class="guide-tag">ИНФОРМАТИКА</span><strong>Python: базовые конструкции</strong></summary><div class="guide-body"><pre><code>for i in range(5):
+    print(i)
+
+if x > 0:
+    print("positive")
+else:
+    print("not positive")
+
+def square(x):
+    return x * x</code></pre><ul><li><code>/</code> — обычное деление; <code>//</code> — целочисленное с округлением вниз.</li><li><code>%</code> — остаток от деления.</li><li><code>**</code> — возведение в степень.</li><li>Индексация списка начинается с 0.</li></ul></div></details>
+    <details class="guide-card" data-guide-subject="Информатика"><summary><span class="guide-tag">ИНФОРМАТИКА</span><strong>Алгоритмы и сложность</strong></summary><div class="guide-body"><ul><li><b>O(1)</b> — постоянное число операций.</li><li><b>O(log n)</b> — логарифмический рост, например бинарный поиск в отсортированном массиве.</li><li><b>O(n)</b> — один проход по данным.</li><li><b>O(n²)</b> — часто два вложенных цикла по n элементам.</li></ul><p>Сложность оценивает рост работы алгоритма при увеличении входных данных, а не точное время выполнения.</p></div></details>
+  </div>
+</section>
       <section class="tab-panel study-panel" id="panel-training" aria-labelledby="nav-training" hidden>
   <div class="page-intro"><p class="eyebrow">ПРАКТИКА ЕГЭ</p><h2>Тренинг</h2><p>Решай, проверяй себя и разбирай ошибки. Результаты сохраняются на устройстве и синхронизируются после входа в аккаунт.</p></div>
   <div class="study-controls"><label>Предмет<select id="quiz-subject"><option value="all">Все предметы</option><option value="Информатика">Информатика</option><option value="Русский язык">Русский язык</option><option value="Математика">Математика</option></select></label><label>Количество<select id="quiz-count"><option value="5">5 заданий</option><option value="10" selected>10 заданий</option><option value="all">Все доступные</option></select></label></div>
@@ -157,11 +179,13 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Основная навигация">
-      <button class="nav-item active" id="nav-weak" type="button" data-tab="weak" aria-current="page"><span class="nav-icon">◈</span><span>Слабые</span></button>
-      <button class="nav-item" id="nav-training" type="button" data-tab="training"><span class="nav-icon">◎</span><span>Тренинг</span></button>
-      <button class="nav-item" id="nav-cards" type="button" data-tab="cards"><span class="nav-icon">▤</span><span>Карточки</span></button>
-      <button class="nav-item" id="nav-progress" type="button" data-tab="progress"><span class="nav-icon">↗</span><span>Прогресс</span></button>
-      <button class="nav-item" id="nav-account" type="button" data-tab="account"><span class="nav-icon">◎</span><span>Аккаунт</span></button>
+      <button class="nav-item active" id="nav-weak" data-tab="weak" type="button"><span class="nav-icon">⌂</span><span>Главная</span></button>
+      <button class="nav-item" id="nav-daily" data-tab="daily" type="button"><span class="nav-icon">✳</span><span>Сегодня</span></button>
+      <button class="nav-item" id="nav-training" data-tab="training" type="button"><span class="nav-icon">◎</span><span>Тренажёр</span></button>
+      <button class="nav-item" id="nav-cards" data-tab="cards" type="button"><span class="nav-icon">▤</span><span>Карточки</span></button>
+      <button class="nav-item" id="nav-guide" data-tab="guide" type="button"><span class="nav-icon">▣</span><span>База</span></button>
+      <button class="nav-item" id="nav-progress" data-tab="progress" type="button"><span class="nav-icon">↗</span><span>Прогресс</span></button>
+      <button class="nav-item" id="nav-account" data-tab="account" type="button"><span class="nav-icon">◉</span><span>Профиль</span></button>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
