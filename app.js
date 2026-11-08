@@ -670,10 +670,21 @@
     data.completedToday=Math.min(DAILY_GOAL,(Number(data.completedToday)||0)+1);
     saveData();renderDailyChallenge();renderDaily();renderErrors();renderTopics();renderProgress();
   });
+  let activeGuideFilter="all";
+  function filterGuide() {
+    const query=($("#guide-search")?.value||"").trim().toLocaleLowerCase("ru-RU");
+    document.querySelectorAll("[data-guide-subject]").forEach(card=>{
+      const subjectMatch=activeGuideFilter==="all"||card.dataset.guideSubject===activeGuideFilter;
+      const textMatch=!query||card.textContent.toLocaleLowerCase("ru-RU").includes(query);
+      card.hidden=!(subjectMatch&&textMatch);
+    });
+  }
   document.querySelectorAll("[data-guide-filter]").forEach(button=>button.addEventListener("click",()=>{
+    activeGuideFilter=button.dataset.guideFilter;
     document.querySelectorAll("[data-guide-filter]").forEach(item=>item.classList.toggle("active",item===button));
-    document.querySelectorAll("[data-guide-subject]").forEach(card=>card.hidden=button.dataset.guideFilter!=="all"&&card.dataset.guideSubject!==button.dataset.guideFilter);
+    filterGuide();
   }));
+  $("#guide-search").addEventListener("input",filterGuide);
 
   const savedTheme = localStorage.getItem(THEME_KEY);
   const preferredTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
