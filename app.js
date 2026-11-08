@@ -38,7 +38,8 @@
       streak: 0,
       quizHistory: [],
       answers: [],
-      cardProgress: {}
+      cardProgress: {},
+      dailyChallenge: null
     };
   }
 
@@ -56,7 +57,8 @@
         streak: Number(parsed.streak) || 0,
         quizHistory: Array.isArray(parsed.quizHistory) ? parsed.quizHistory : [],
         answers: Array.isArray(parsed.answers) ? parsed.answers : [],
-        cardProgress: parsed.cardProgress && typeof parsed.cardProgress === "object" ? parsed.cardProgress : {}
+        cardProgress: parsed.cardProgress && typeof parsed.cardProgress === "object" ? parsed.cardProgress : {},
+        dailyChallenge: parsed.dailyChallenge && typeof parsed.dailyChallenge === "object" ? parsed.dailyChallenge : null
       };
     } catch (error) {
       console.warn("Не удалось прочитать сохранённые данные:", error);
@@ -513,7 +515,7 @@
       const parsed=JSON.parse(await file.text()), imported=parsed&&parsed.data?parsed.data:parsed;
       if (!imported||!Array.isArray(imported.topics)||!Array.isArray(imported.errors)) throw new Error("Неверный формат");
       if (!window.confirm("Импорт заменит текущие темы, журнал и результаты данными из файла. Продолжить?")) return;
-      data={topics:imported.topics,errors:imported.errors,completedToday:Number(imported.completedToday)||0,lastActiveDate:imported.lastActiveDate||"",streak:Number(imported.streak)||0,quizHistory:Array.isArray(imported.quizHistory)?imported.quizHistory:[],answers:Array.isArray(imported.answers)?imported.answers:[],cardProgress:imported.cardProgress&&typeof imported.cardProgress==="object"?imported.cardProgress:{}};
+      data={topics:imported.topics,errors:imported.errors,completedToday:Number(imported.completedToday)||0,lastActiveDate:imported.lastActiveDate||"",streak:Number(imported.streak)||0,quizHistory:Array.isArray(imported.quizHistory)?imported.quizHistory:[],answers:Array.isArray(imported.answers)?imported.answers:[],cardProgress:imported.cardProgress&&typeof imported.cardProgress==="object"?imported.cardProgress:{},dailyChallenge:imported.dailyChallenge||null};
       saveData(); renderAll(); renderQuizHistory(); renderCard(); renderProgress(); showToast("Данные импортированы.");
     } catch(error) { showToast("Не удалось импортировать файл резервной копии."); }
     finally { $("#import-data").value=""; }
@@ -628,6 +630,51 @@
   $("#refresh-leaderboard").addEventListener("click",renderLeaderboard);
   if(cloud)cloud.auth.onAuthStateChange((event)=>{if(event==="SIGNED_IN"||event==="TOKEN_REFRESHED"||event==="SIGNED_OUT")refreshAccountUI();});
 
+
+  function dailyQuestions() {
+    const day=localDateKey();
+    const subjects=["Русский язык","Математика","Информатика"];
+    return subjects.map(subject=>{
+      const list=questionBank.filter(q=>q.subject===subject);
+      const seed=day.split("-").join("")+subject.length*17;
+      const index=Array.from(seed).reduce((sum,ch)=>sum+ch.charCodeAt(0),0)%list.length;
+      return list[index];
+    });
+  }
+  function renderDailyChallenge() {
+    const host=$("#daily-challenge-list"); if(!host)return;
+    const tasks=dailyQuestions(),day=localDateKey();
+    if(!data.dailyChallenge||data.dailyChallenge.date!==day)data.dailyChallenge={date:day,completed:[]};
+    $("#daily-date-label").textContent=new Date().toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();
+    $("#daily-challenge-count").textContent=data.dailyChallenge.completed.length+" / 3 выполнено";
+    host.innerHTML=tasks.map((q,index)=>{
+      const result=data.dailyChallenge.completed.find(item=>item.id===q.id);
+      const options=q.options.map((option,i)=>'<button class="daily-option '+(result?(i===q.answer?"correct":i===result.choice?"incorrect":""):"")+'" data-daily-id="'+q.id+'" data-daily-choice="'+i+'" '+(result?"disabled":"")+'><span>'+String.fromCharCode(65+i)+'</span>'+escapeHtml(option)+'</button>').join("");
+      return '<article class="daily-task-card"><div class="daily-task-top"><span>'+escapeHtml(q.subject)+'</span><b>0'+(index+1)+'</b></div><p>'+escapeHtml(q.topic)+'</p><h3>'+escapeHtml(q.q)+'</h3><div class="daily-options">'+options+'</div>'+(result?'<div class="daily-explanation '+(result.correct?"good":"bad")+'"><strong>'+(result.correct?"Верно":"Разберём ошибку")+'</strong><p>'+escapeHtml(q.explain)+'</p></div>':'<small class="daily-prompt">Выбери ответ — объяснение появится сразу.</small>')+'</article>';
+    }).join("");
+    saveData();
+  }
+  $("#daily-challenge-list").addEventListener("click",event=>{
+    const button=event.target.closest("[data-daily-choice]");if(!button)return;
+    const id=button.dataset.dailyId,choice=Number(button.dataset.dailyChoice),q=questionBank.find(item=>item.id===id);
+    if(!q||data.dailyChallenge.completed.some(item=>item.id===id))return;
+    const correct=choice===q.answer;
+    data.dailyChallenge.completed.push({id,choice,correct});
+    data.answers.push({id:"daily-"+id+"-"+localDateKey(),subject:q.subject,topic:q.topic,correct,date:localDateKey()});
+    if(!correct){
+      const topic=data.topics.find(item=>item.subject===q.subject&&item.title===q.topic);
+      if(topic){topic.mastery=clamp(topic.mastery-3);topic.errors=(Number(topic.errors)||0)+1;}
+      data.errors.push({id:"daily-error-"+id+"-"+Date.now(),topicId:topic?topic.id:"",subject:q.subject,topic:q.topic,task:"",reason:"Ошибка в задании дня",masteryDelta:3,comment:q.q+" Правильный ответ: "+q.options[q.answer],date:new Date().toLocaleDateString("ru-RU")});
+      if(data.errors.length>100)data.errors=data.errors.slice(-100);
+    }
+    data.completedToday=Math.min(DAILY_GOAL,(Number(data.completedToday)||0)+1);
+    saveData();renderDailyChallenge();renderDaily();renderErrors();renderTopics();renderProgress();
+  });
+  document.querySelectorAll("[data-guide-filter]").forEach(button=>button.addEventListener("click",()=>{
+    document.querySelectorAll("[data-guide-filter]").forEach(item=>item.classList.toggle("active",item===button));
+    document.querySelectorAll("[data-guide-subject]").forEach(card=>card.hidden=button.dataset.guideFilter!=="all"&&card.dataset.guideSubject!==button.dataset.guideFilter);
+  }));
+
   const savedTheme = localStorage.getItem(THEME_KEY);
   const preferredTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   applyTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : preferredTheme);
@@ -636,6 +683,7 @@
   renderQuizHistory();
   renderCard();
   renderProgress();
+  renderDailyChallenge();
   refreshAccountUI();
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
