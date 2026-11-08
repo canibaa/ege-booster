@@ -275,3 +275,80 @@ h3 { margin: 0; font-size: 16px; letter-spacing: -.25px; }
 .leader-place{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:850}
 .leader-row strong{flex:1;min-width:0;overflow-wrap:anywhere;font-size:12px}
 .leader-row b{white-space:nowrap;color:var(--accent);font-size:11px}
+
+/* EGE LAB — visual identity refresh */
+:root{--accent:#a3e635;--accent-soft:rgba(163,230,53,.13);--green:#65b879;--surface:#ffffff;--surface-soft:#f5f7f2;--line:#e4e9df;--text:#172019;--muted:#69766b;--red:#d65c62;--shadow:0 12px 35px rgba(28,45,25,.07)}
+:root[data-theme="dark"]{--accent:#b6f35b;--accent-soft:rgba(182,243,91,.12);--surface:#171d19;--surface-soft:#202922;--line:#303d33;--text:#edf5e9;--muted:#a0afa0;--shadow:0 14px 35px rgba(0,0,0,.2)}
+body{background:#edf1e9;color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+:root[data-theme="dark"] body{background:#0d130f}
+.app-shell{max-width:1120px;padding:22px 30px 112px}
+.topbar{position:relative;gap:13px;margin-bottom:28px;padding:13px 16px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.brand-mark{display:grid;place-items:center;width:43px;height:43px;border-radius:13px;background:#172019;color:#b6f35b;font-size:19px;font-weight:950}
+.brand-copy h1{font-size:17px;letter-spacing:.12em}
+.brand-copy .eyebrow{font-size:9px;letter-spacing:.16em}
+.topbar-meta{margin-left:auto;color:var(--muted);font-size:11px;font-weight:750}
+.greeting-row{align-items:flex-start;gap:20px;padding:24px 0 28px}
+.greeting-row h2{font-size:clamp(34px,5vw,54px);line-height:1.03;letter-spacing:-.055em}
+.hero-subtitle{max-width:430px;margin:15px 0 0;color:var(--muted);font-size:14px;line-height:1.6}
+.streak-pill{border:1px solid var(--line);background:var(--surface);border-radius:15px;padding:11px 13px}
+.daily-card,.boss-card,.error-form,.question-card,.flashcard,.stat-card,.backup-card,.account-card{border-radius:20px}
+.primary-button{background:#172019;color:#c4f77b;border-radius:12px}
+:root[data-theme="dark"] .primary-button{background:#b6f35b;color:#172019}
+.section-heading{margin-top:28px}
+.section-heading h2{font-size:20px;letter-spacing:-.025em}
+.daily-card{background:#172019;color:#f1f8e9;border:0}
+.daily-card .soft-label,.daily-card .daily-progress-line{color:#b8c5b5}
+.daily-card .progress-track{background:#3b493b}
+.daily-card .progress-track span{background:#b6f35b}
+.daily-card .text-button{color:#c4f77b}
+.boss-card{border:1px solid var(--line);box-shadow:var(--shadow)}
+.tab-panel{animation:panel-in .22s ease}
+@keyframes panel-in{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.bottom-nav{max-width:1000px;grid-template-columns:repeat(7,minmax(0,1fr));padding:9px 10px calc(9px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0}
+.nav-item{font-size:10px}
+.nav-item.active{background:var(--accent-soft);color:var(--text)}
+.nav-item.active .nav-icon{color:#75a92d}
+.page-intro h2{font-size:clamp(30px,4vw,43px);letter-spacing:-.045em;line-height:1.08}
+.daily-challenge-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.daily-challenge-head span{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.1em}
+.daily-challenge-head strong{font-size:12px}
+.daily-challenge-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.daily-task-card{min-width:0;padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.daily-task-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.daily-task-top span,.daily-task-card>p{color:var(--muted);font-size:10px;font-weight:750}
+.daily-task-top b{color:var(--accent);font-size:12px}
+.daily-task-card h3{min-height:74px;margin:9px 0 15px;font-size:15px;line-height:1.45}
+.daily-options{display:grid;gap:7px}
+.daily-option{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text);text-align:left;font-size:11px;cursor:pointer}
+.daily-option span{display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:7px;background:var(--surface);font-size:9px;font-weight:850}
+.daily-option:disabled{cursor:default;opacity:1}
+.daily-option.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--surface))}
+.daily-option.incorrect{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--surface))}
+.daily-explanation{margin-top:12px;padding:11px;border-radius:10px;font-size:11px;line-height:1.55}
+.daily-explanation p{margin:5px 0 0}
+.daily-explanation.good{background:color-mix(in srgb,var(--green) 12%,var(--surface))}
+.daily-explanation.bad{background:color-mix(in srgb,var(--red) 10%,var(--surface))}
+.daily-prompt{display:block;margin-top:11px;color:var(--muted);font-size:10px}
+.daily-note,.guide-warning{margin:17px 0;padding:16px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.daily-note p,.guide-warning p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.guide-warning{border-left:3px solid #d2a44b}
+.guide-filter{display:flex;gap:7px;overflow-x:auto;padding:2px 0 13px}
+.guide-filter-btn{flex:0 0 auto;padding:9px 13px;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--muted);font-size:11px;font-weight:750}
+.guide-filter-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.guide-list{display:grid;gap:9px}
+.guide-card{border:1px solid var(--line);border-radius:15px;background:var(--surface);overflow:hidden}
+.guide-card summary{display:grid;gap:7px;padding:15px;cursor:pointer;list-style:none}
+.guide-card summary::-webkit-details-marker{display:none}
+.guide-tag{color:#729d32;font-size:9px;font-weight:900;letter-spacing:.12em}
+.guide-card summary strong{font-size:14px}
+.guide-body{padding:0 16px 17px;color:var(--muted);font-size:12px;line-height:1.7}
+.guide-body h4{margin:12px 0 5px;color:var(--text);font-size:12px}
+.guide-body p{margin:9px 0}
+.guide-body li{margin:5px 0}
+.guide-body pre{overflow-x:auto;padding:13px;border-radius:11px;background:var(--surface-soft);color:var(--text);font-size:11px}
+.guide-tip{padding:10px;border-radius:10px;background:var(--accent-soft)}
+.guide-table{width:100%;border-collapse:collapse;font-size:10px;text-align:center}
+.guide-table th,.guide-table td{padding:7px 4px;border:1px solid var(--line)}
+.guide-table th{color:var(--text)}
+@media(max-width:760px){.app-shell{padding:12px 15px 105px}.daily-challenge-list{grid-template-columns:1fr}.daily-task-card h3{min-height:0}.topbar-meta{display:none}.bottom-nav{overflow-x:auto;grid-template-columns:repeat(7,minmax(64px,1fr));gap:2px}.nav-item{font-size:9px}.greeting-row h2{font-size:36px}}
+@media(min-width:761px){#panel-weak .topic-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#panel-weak .error-form{max-width:760px}}
