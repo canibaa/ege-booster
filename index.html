@@ -114,7 +114,7 @@
       </section>
 
       <section class="tab-panel study-panel" id="panel-training" aria-labelledby="nav-training" hidden>
-  <div class="page-intro"><p class="eyebrow">ПРАКТИКА ЕГЭ</p><h2>Тренинг</h2><p>Решай, проверяй себя и разбирай ошибки. Результаты сохраняются на этом устройстве.</p></div>
+  <div class="page-intro"><p class="eyebrow">ПРАКТИКА ЕГЭ</p><h2>Тренинг</h2><p>Решай, проверяй себя и разбирай ошибки. Результаты сохраняются на устройстве и синхронизируются после входа в аккаунт.</p></div>
   <div class="study-controls"><label>Предмет<select id="quiz-subject"><option value="all">Все предметы</option><option value="Информатика">Информатика</option><option value="Русский язык">Русский язык</option><option value="Математика">Математика</option></select></label><label>Количество<select id="quiz-count"><option value="5">5 заданий</option><option value="10" selected>10 заданий</option><option value="all">Все доступные</option></select></label></div>
   <div class="quiz-summary" id="quiz-summary"><span>Готов к старту?</span><strong>Выбери параметры и начинай</strong></div>
   <button class="primary-button" id="start-quiz" type="button">Начать тренировку <span aria-hidden="true">→</span></button><div id="quiz-area" class="quiz-area" aria-live="polite"></div>
@@ -126,16 +126,6 @@
   <div class="flashcard-wrap" id="flashcard-wrap"><div class="flashcard empty-card"><span class="soft-label">Твоя колода</span><h3>Карточки ждут</h3><p>Выбери предмет и режим повторения.</p></div></div>
   <div class="flashcard-actions" id="flashcard-actions" hidden><button class="secondary-button" id="reveal-card" type="button">Показать ответ</button><div class="rating-actions" id="rating-actions" hidden><button class="rate-again" id="rate-again" type="button">Не помню</button><button class="rate-known" id="rate-known" type="button">Знаю ✓</button></div></div><div class="card-counter" id="card-counter">Карточек изучено: 0</div>
 </section>
-      <section class="tab-panel study-panel" id="panel-polina" aria-labelledby="nav-polina" hidden>
-  <div class="page-intro"><p class="eyebrow">РУССКИЙ ЯЗЫК · ЕГЭ</p><h2>Полина</h2><p>Небольшие задания на орфографию и пунктуацию. Введи исправленный вариант целиком: ответы и ошибки сохраняются в этом браузере.</p></div>
-  <div class="polina-summary" id="polina-summary"><strong>Начинаем спокойно</strong><span>Сначала попробуйте 6 заданий. После проверки можно разобрать каждую ошибку.</span></div>
-  <div class="polina-controls"><label>Тема<select id="polina-topic"><option value="all">Орфография и пунктуация</option><option value="Орфография">Орфография</option><option value="Пунктуация">Пунктуация</option></select></label><label>Заданий<select id="polina-count"><option value="4">4 задания</option><option value="6" selected>6 заданий</option><option value="all">Все задания</option></select></label></div>
-  <button class="primary-button" id="polina-start" type="button">Начать задания →</button>
-  <div id="polina-quiz" class="polina-quiz" aria-live="polite"></div>
-  <div class="section-heading polina-history-heading"><div><p class="eyebrow">СОХРАНЁННЫЕ ПОПЫТКИ</p><h2>История Полины</h2></div></div>
-  <div id="polina-history" class="polina-history"></div>
-  <div class="backup-card polina-report-card"><h3>Отчёт для разбора</h3><p></p><div class="backup-actions"><button class="secondary-button" id="polina-copy-report" type="button">Скопировать отчёт</button><button class="secondary-button" id="polina-download-report" type="button">Скачать отчёт</button></div><p class="form-hint">Попытки сохраняются локально на этом устройстве. Чтобы данные появились на другом телефоне, понадобится экспорт/передача отчёта.</p></div>
-</section>
       <section class="tab-panel study-panel" id="panel-progress" aria-labelledby="nav-progress" hidden>
   <div class="page-intro"><p class="eyebrow">ТВОЙ РОСТ</p><h2>Прогресс</h2><p>Здесь собраны результаты тренировок и то, что стоит подтянуть дальше.</p></div>
   <div class="stats-grid"><article class="stat-card"><span>Решено заданий</span><strong id="stat-answered">0</strong><small>за всё время</small></article><article class="stat-card"><span>Точность</span><strong id="stat-accuracy">—</strong><small>правильных ответов</small></article><article class="stat-card"><span>Тренировок</span><strong id="stat-quizzes">0</strong><small>завершено</small></article><article class="stat-card"><span>Карточек знаю</span><strong id="stat-cards">0</strong><small>отмечено «Знаю»</small></article></div>
@@ -144,6 +134,26 @@
   <div class="section-heading"><div><p class="eyebrow">ДАННЫЕ ПРИЛОЖЕНИЯ</p><h2>Резервная копия</h2></div></div>
   <div class="backup-card"><p>Сохрани результаты, темы и журнал ошибок в файл. Его можно использовать для переноса данных на другое устройство.</p><div class="backup-actions"><button class="secondary-button" id="export-data" type="button">Экспортировать данные</button><label class="secondary-button import-label">Импортировать файл<input id="import-data" type="file" accept="application/json,.json" hidden></label></div><p class="form-hint">Данные хранятся в браузере. Экспортируй их перед очисткой истории или сменой устройства.</p></div>
 </section>
+
+      <section class="tab-panel study-panel" id="panel-account" aria-labelledby="nav-account" hidden>
+        <div class="page-intro"><p class="eyebrow">ОБЛАЧНЫЙ ПРОФИЛЬ</p><h2>Аккаунт и рейтинг</h2><p>Создай аккаунт, чтобы сохранять прогресс в облаке и участвовать в общем рейтинге.</p></div>
+        <div class="account-card">
+          <div class="account-user" id="account-user">Не выполнен вход</div>
+          <form id="auth-form" class="auth-form">
+            <label>Действие<select id="auth-mode"><option value="signup">Создать аккаунт</option><option value="login">Войти</option></select></label>
+            <label id="auth-username-label">Ник для рейтинга<input id="auth-username" type="text" minlength="3" maxlength="20" autocomplete="nickname" placeholder="Например, Ruslan_11"></label>
+            <label>Электронная почта<input id="auth-email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+            <label>Пароль<input id="auth-password" type="password" required minlength="6" autocomplete="new-password" placeholder="Не менее 6 символов"></label>
+            <button class="primary-button" id="auth-submit" type="submit">Создать аккаунт</button>
+          </form>
+          <button class="secondary-button" id="logout-button" type="button" hidden>Выйти из аккаунта</button>
+          <p class="cloud-status" id="cloud-status" role="status">Проверяем подключение…</p>
+          <p class="form-hint">Пароль вводится только в Supabase. Не отправляй его в чат. Для регистрации может потребоваться подтверждение почты.</p>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">ОБЩИЕ РЕЗУЛЬТАТЫ</p><h2>Таблица лидеров</h2></div><button class="secondary-button" id="refresh-leaderboard" type="button">Обновить</button></div>
+        <div id="leaderboard-list" class="leaderboard-list"><div class="empty-state">Загружаем рейтинг…</div></div>
+        <p class="form-hint">Очки: правильный ответ — 10, тренировка — 5, изученная карточка — 2. Это учебный рейтинг, а не официальный результат ЕГЭ.</p>
+      </section>
     </main>
 
     <nav class="bottom-nav" aria-label="Основная навигация">
@@ -151,10 +161,11 @@
       <button class="nav-item" id="nav-training" type="button" data-tab="training"><span class="nav-icon">◎</span><span>Тренинг</span></button>
       <button class="nav-item" id="nav-cards" type="button" data-tab="cards"><span class="nav-icon">▤</span><span>Карточки</span></button>
       <button class="nav-item" id="nav-progress" type="button" data-tab="progress"><span class="nav-icon">↗</span><span>Прогресс</span></button>
-      <button class="nav-item" id="nav-polina" type="button" data-tab="polina"><span class="nav-icon">А</span><span>Полина</span></button>
+      <button class="nav-item" id="nav-account" type="button" data-tab="account"><span class="nav-icon">◎</span><span>Аккаунт</span></button>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
