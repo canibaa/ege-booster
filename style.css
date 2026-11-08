@@ -323,3 +323,6 @@ body{background:#edf1e9;color:var(--text);font-family:Inter,-apple-system,BlinkM
 .guide-table th{color:var(--text)}
 @media(max-width:760px){.app-shell{padding:12px 15px 105px}.daily-challenge-list{grid-template-columns:1fr}.daily-task-card h3{min-height:0}.topbar-meta{display:none}.bottom-nav{overflow-x:auto;grid-template-columns:repeat(7,minmax(64px,1fr));gap:2px}.nav-item{font-size:9px}.greeting-row h2{font-size:36px}}
 @media(min-width:761px){#panel-weak .topic-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#panel-weak .error-form{max-width:760px}}
+.guide-search-label{display:grid;gap:7px;margin:0 0 13px;color:var(--muted);font-size:11px;font-weight:750}
+.guide-search-label input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);font:inherit;font-size:13px;outline:none}
+.guide-search-label input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
