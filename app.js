@@ -421,10 +421,14 @@
   function startQuiz() {
     const subject=$("#quiz-subject").value, countValue=$("#quiz-count").value;
     let available=questionBank.filter((q)=>subject==="all"||q.subject===subject);
+    const level=$("#quiz-level")?.value||"all";
+    if(level==="1")available=available.filter(q=>(Number(q.difficulty)||1)===1);
+    if(level==="2")available=available.filter(q=>(Number(q.difficulty)||1)===2);
+    if(level==="3")available=available.filter(q=>(Number(q.difficulty)||1)>=3);
     available=shuffle(available);
     const count=countValue==="all"?available.length:Math.min(Number(countValue),available.length);
     activeQuiz=available.slice(0,count); activeQuestionIndex=0; activeQuizAnswers=[];
-    $("#quiz-summary").innerHTML='<span>Тренировка началась</span><strong>'+activeQuiz.length+' заданий · '+escapeHtml(subject==="all"?"Все предметы":subject)+'</strong>';
+    $("#quiz-summary").innerHTML='<span>Тренировка началась</span><strong>'+activeQuiz.length+' заданий · '+escapeHtml(subject==="all"?"Все предметы":subject)+(level==="all"?"":" · уровень "+level)+'</strong>';
     $("#start-quiz").textContent="Начать заново ↻"; renderQuestion();
   }
   function renderQuestion() {
