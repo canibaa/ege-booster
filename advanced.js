@@ -4,6 +4,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const API = window.EGELAB;
 if (!API) { console.error("ЕГЭ LAB core API missing"); return; }
+API.getQuestions().forEach(q=>{if(!q.difficulty)q.difficulty=["Логарифмы","Неравенства","Производная","Рекурсия","Геометрия","Уравнения"].includes(q.topic)?2:1;});
+API.getDailyQuestions().forEach(q=>{if(!API.getQuestions().some(existing=>existing.id===q.id))API.getQuestions().push(q);});
 const DATA_KEY = "ege-booster-data-v1";
 const subjects = ["Русский язык","Математика","Информатика"];
 const officialBank = "https://fipi.ru/ege/otkrytyy-bank-zadaniy-ege";
