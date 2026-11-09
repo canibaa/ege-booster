@@ -1,4 +1,4 @@
-const CACHE_NAME = "ege-lab-v13";
+const CACHE_NAME = "ege-lab-v14";
 const APP_FILES = [
   "./",
   "./index.html",
