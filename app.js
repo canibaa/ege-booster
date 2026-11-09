@@ -550,7 +550,8 @@
     const correct=answers.filter(item=>item&&item.correct).length;
     const quizzes=Array.isArray(progress.quizHistory)?progress.quizHistory.length:0;
     const cards=progress.cardProgress&&typeof progress.cardProgress==="object"?Object.values(progress.cardProgress).filter(item=>item&&item.known).length:0;
-    const dailyBonus=progress.dailyChallenge&&Array.isArray(progress.dailyChallenge.completed)?progress.dailyChallenge.completed.reduce((sum,item)=>sum+(item&&item.correct?Number(item.points)||0:0),0):0;\n    return correct*10+quizzes*5+cards*2+dailyBonus;
+    const dailyBonus=progress.dailyChallenge&&Array.isArray(progress.dailyChallenge.completed)?progress.dailyChallenge.completed.reduce((sum,item)=>sum+(item&&item.correct?Number(item.points)||0:0),0):0;
+    return correct*10+quizzes*5+cards*2+dailyBonus;
   }
   function scheduleCloudSave() {
     if(!cloud)return;
