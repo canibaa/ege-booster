@@ -288,7 +288,7 @@ body{background:#edf1e9;color:var(--text);font-family:Inter,-apple-system,BlinkM
 .daily-task-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
 .daily-task-top span,.daily-task-card>p{color:var(--muted);font-size:10px;font-weight:750}
 .daily-task-top b{color:var(--accent);font-size:12px}
-.daily-task-card h3{min-height:74px;margin:9px 0 15px;font-size:15px;line-height:1.45}
+.daily-difficulty{display:inline-flex;margin:2px 0 4px;padding:5px 8px;border-radius:8px;background:var(--surface-soft);color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.02em}\n.daily-task-card h3{min-height:74px;margin:9px 0 15px;font-size:15px;line-height:1.45}
 .daily-options{display:grid;gap:7px}
 .daily-option{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text);text-align:left;font-size:11px;cursor:pointer}
 .daily-option span{display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:7px;background:var(--surface);font-size:9px;font-weight:850}
