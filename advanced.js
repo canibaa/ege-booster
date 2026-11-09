@@ -130,7 +130,7 @@ function renderPlan(){
  stats.filter(s=>s.pct===null||s.pct<70).forEach(s=>{if(!suggestions.some(x=>x.subject===s.subject))suggestions.push({subject:s.subject,topic:"Диагностика базовых навыков",why:s.pct===null?"ещё нет статистики":"точность "+s.pct+"%",time:"20 минут"});});
  const chosen=suggestions.slice(0,5);
  const date=new Date().toISOString().slice(0,10);
- if(!d.studyPlan||d.studyPlan.date!==date)d.studyPlan={date,done:[]};
+ if(!d.studyPlan||d.studyPlan.date!==date)d.studyPlan={date,done:[]};if(!Array.isArray(d.studyPlan.done))d.studyPlan.done=[];
  $("#plan-summary").innerHTML='<strong>План на '+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long"})+'</strong><p>Предметы: '+stats.map(s=>esc(s.subject.replace(" язык",""))+" — "+(s.pct===null?"нет данных":s.pct+"%")).join(" · ")+'</p><p>Рекомендация: сначала разбирай повторяющиеся ошибки, затем решай задания на время.</p>';
  $("#plan-list").innerHTML=chosen.map((x,i)=>'<div class="plan-item"><label><input type="checkbox" data-plan-index="'+i+'" '+(d.studyPlan.done.includes(i)?"checked":"")+'><span><b>'+esc(x.subject)+' · '+esc(x.topic)+'</b><small>'+esc(x.why)+' · '+x.time+'</small></span></label><button type="button" class="secondary-button" data-practice-subject="'+esc(x.subject)+'" data-practice-topic="'+esc(x.topic)+'">Повторить</button></div>').join("")||'<div class="empty-state">Пока мало данных. Реши несколько заданий — план станет персональнее.</div>';
  $("#plan-list").querySelectorAll("[data-plan-index]").forEach(c=>c.addEventListener("change",()=>{const n=Number(c.dataset.planIndex);d.studyPlan.done=d.studyPlan.done.filter(x=>x!==n);if(c.checked)d.studyPlan.done.push(n);persist();}));
@@ -181,7 +181,7 @@ function renderExam(){
 function finishExam(timeout){
  clearInterval(state.timer);const ex=state.exam;if(!ex)return;
  let correct=0;const d=getData();
- ex.pool.forEach((q,i)=>{const ok=ex.answers[i]===q.answer;if(ok)correct++;d.answers.push({id:"exam-"+q.id+"-"+Date.now()+"-"+i,subject:q.subject,topic:q.topic,correct:ok,date:new Date().toISOString().slice(0,10)});if(!ok)d.errors.push({id:"exam-error-"+Date.now()+"-"+i,subject:q.subject,topic:q.topic,task:"",reason:"Ошибка в диагностическом экзамене",comment:q.q+" Правильный ответ: "+q.options[q.answer],date:new Date().toLocaleDateString("ru-RU")});});
+ ex.pool.forEach((q,i)=>{const ok=ex.answers[i]===q.answer;if(ok)correct++;d.answers.push({id:"exam-"+q.id+"-"+Date.now()+"-"+i,subject:q.subject,topic:q.topic,correct:ok,date:new Date().toISOString().slice(0,10)});let topic=d.topics.find(t=>t.subject===q.subject&&t.title===q.topic);if(!topic){topic={id:"exam-"+q.id,subject:q.subject,title:q.topic,mastery:ok?55:38,errors:ok?0:1};d.topics.push(topic);}else{topic.mastery=Math.max(0,Math.min(100,(Number(topic.mastery)||0)+(ok?2:-4)));if(!ok)topic.errors=(Number(topic.errors)||0)+1;}if(!ok)d.errors.push({id:"exam-error-"+Date.now()+"-"+i,subject:q.subject,topic:q.topic,task:"",reason:"Ошибка в диагностическом экзамене",comment:q.q+" Правильный ответ: "+q.options[q.answer],date:new Date().toLocaleDateString("ru-RU")});});d.answers=d.answers.slice(-1000);d.errors=d.errors.slice(-100);
  d.quizHistory.unshift({date:new Date().toLocaleDateString("ru-RU"),subject:ex.subject+" · экзамен",total:ex.pool.length,score:correct});d.quizHistory=d.quizHistory.slice(0,50);persist();API.renderAll();
  const pct=Math.round(correct/ex.pool.length*100);
  $("#exam-live").hidden=true;$("#exam-setup").hidden=false;
