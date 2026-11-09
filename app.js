@@ -724,6 +724,8 @@
   renderDailyChallenge();
   refreshAccountUI();
 
+  window.EGELAB = { getData: () => data, saveData, renderAll, getQuestions: () => questionBank, getDailyQuestions: () => Object.values(advancedDailyBank).flat() };
+
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js", { scope: "./" })
