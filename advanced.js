@@ -88,7 +88,7 @@ const maps = {
 ["24","Обработка текстовых файлов","Используй поиск, подсчёт символов и аккуратную обработку строк.","Определи шаблон; учти регистр и границы; проверь тестовый фрагмент.","Найди максимальное число подряд идущих символов по условию."],
 ["25","Обработка целых чисел и делители","Используй перебор до корня числа, проверку делимости и оптимизацию.","Ограничь диапазон; проверяй пары делителей; учитывай квадратный корень.","Найди все числа в диапазоне с заданным количеством делителей."],
 ["26","Обработка данных и оптимизация","Своди условие к сортировке, жадному выбору или динамике; доказывай оптимальность.","Определи цель; отсортируй по ключу; докажи, почему локальный выбор корректен.","Найди максимальное число объектов при заданном ограничении."],
-["27","Сложная задача на программирование","Выбери эффективный алгоритм; оцени сложность; проверь крайние случаи и формат ответа.","Сначала докажи идею; оцени O(n) или O(n log n); реализуй; проверь тесты и границы.","Разработай алгоритм обработки большого массива с требуемой сложностью."]
+["27","Сложная задача на программирование","Выбери эффективный алгоритм; оцени сложность; проверь крайние случаи. В проекте ЕГЭ-2027 формат ответа — одна строка из двух чисел.","Сначала докажи идею; оцени O(n) или O(n log n); реализуй; проверь тесты и формат двух чисел.","Разработай алгоритм обработки большого массива с требуемой сложностью."]
 ]};
 const state = {subject:"Русский язык",number:"1",exam:null,timer:null,seconds:0,answers:[],planDate:""};
 function getData(){return API.getData();}
@@ -193,7 +193,7 @@ function bind(){
  $("#catalog-subject").addEventListener("change",()=>renderCatalog());
  $("#catalog-number").addEventListener("change",()=>renderCatalog());
  $("#catalog-search").addEventListener("input",()=>renderCatalog());
- $("#catalog-detail").addEventListener("click",e=>{if(e.target.id!=="catalog-practice")return;const num=$("#catalog-number").value;const subject=$("#catalog-subject").value;const topic=maps[subject].find(x=>x[0]===num);const pool=API.getQuestions().filter(q=>q.subject===subject);if(pool.length){$("#quiz-subject").value=subject;$("#quiz-count").value="all";document.querySelector('[data-tab="training"]').click();const start=$("#start-quiz");start.click();}else window.open(officialBank,"_blank","noopener");});
+ $("#catalog-detail").addEventListener("click",e=>{if(e.target.id!=="catalog-practice")return;const num=$("#catalog-number").value;const subject=$("#catalog-subject").value;const topic=maps[subject].find(x=>x[0]===num);if(topic){setTab("plan");startAdaptivePractice(subject,topic[1]);}else window.open(officialBank,"_blank","noopener");});
  $("#exam-start").addEventListener("click",startExam);
  $("#plan-refresh").addEventListener("click",renderPlan);
  document.querySelectorAll(".nav-item").forEach(b=>{if(!b.dataset.advancedBound){b.dataset.advancedBound="1";b.addEventListener("click",()=>{if(b.dataset.tab==="catalog")renderCatalog();if(b.dataset.tab==="plan")renderPlan();});}});
