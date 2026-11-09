@@ -1,9 +1,10 @@
-const CACHE_NAME = "ege-lab-v9";
+const CACHE_NAME = "ege-lab-v10";
 const APP_FILES = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
+  "./advanced.js",
   "./manifest.json",
   "./icons/icon-192.svg",
   "./icons/icon-512.svg"
