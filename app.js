@@ -39,7 +39,8 @@
       quizHistory: [],
       answers: [],
       cardProgress: {},
-      dailyChallenge: null
+      dailyChallenge: null,
+      dailyBonusPoints: 0
     };
   }
 
@@ -58,7 +59,8 @@
         quizHistory: Array.isArray(parsed.quizHistory) ? parsed.quizHistory : [],
         answers: Array.isArray(parsed.answers) ? parsed.answers : [],
         cardProgress: parsed.cardProgress && typeof parsed.cardProgress === "object" ? parsed.cardProgress : {},
-        dailyChallenge: parsed.dailyChallenge && typeof parsed.dailyChallenge === "object" ? parsed.dailyChallenge : null
+        dailyChallenge: parsed.dailyChallenge && typeof parsed.dailyChallenge === "object" ? parsed.dailyChallenge : null,
+        dailyBonusPoints: Number(parsed.dailyBonusPoints) || 0
       };
     } catch (error) {
       console.warn("Не удалось прочитать сохранённые данные:", error);
@@ -515,7 +517,7 @@
       const parsed=JSON.parse(await file.text()), imported=parsed&&parsed.data?parsed.data:parsed;
       if (!imported||!Array.isArray(imported.topics)||!Array.isArray(imported.errors)) throw new Error("Неверный формат");
       if (!window.confirm("Импорт заменит текущие темы, журнал и результаты данными из файла. Продолжить?")) return;
-      data={topics:imported.topics,errors:imported.errors,completedToday:Number(imported.completedToday)||0,lastActiveDate:imported.lastActiveDate||"",streak:Number(imported.streak)||0,quizHistory:Array.isArray(imported.quizHistory)?imported.quizHistory:[],answers:Array.isArray(imported.answers)?imported.answers:[],cardProgress:imported.cardProgress&&typeof imported.cardProgress==="object"?imported.cardProgress:{},dailyChallenge:imported.dailyChallenge||null};
+      data={topics:imported.topics,errors:imported.errors,completedToday:Number(imported.completedToday)||0,lastActiveDate:imported.lastActiveDate||"",streak:Number(imported.streak)||0,quizHistory:Array.isArray(imported.quizHistory)?imported.quizHistory:[],answers:Array.isArray(imported.answers)?imported.answers:[],cardProgress:imported.cardProgress&&typeof imported.cardProgress==="object"?imported.cardProgress:{},dailyChallenge:imported.dailyChallenge||null,dailyBonusPoints:Number(imported.dailyBonusPoints)||0};
       saveData(); renderAll(); renderQuizHistory(); renderCard(); renderProgress(); showToast("Данные импортированы.");
     } catch(error) { showToast("Не удалось импортировать файл резервной копии."); }
     finally { $("#import-data").value=""; }
@@ -550,7 +552,7 @@
     const correct=answers.filter(item=>item&&item.correct).length;
     const quizzes=Array.isArray(progress.quizHistory)?progress.quizHistory.length:0;
     const cards=progress.cardProgress&&typeof progress.cardProgress==="object"?Object.values(progress.cardProgress).filter(item=>item&&item.known).length:0;
-    const dailyBonus=progress.dailyChallenge&&Array.isArray(progress.dailyChallenge.completed)?progress.dailyChallenge.completed.reduce((sum,item)=>sum+(item&&item.correct?Number(item.points)||0:0),0):0;
+    const dailyBonus=Number(progress.dailyBonusPoints)||0;
     return correct*10+quizzes*5+cards*2+dailyBonus;
   }
   function scheduleCloudSave() {
@@ -684,6 +686,7 @@
     const correct=choice===q.answer;
     data.dailyChallenge.completed.push({id,choice,correct,points:correct?q.points:0});
     data.dailyChallenge.points=(Number(data.dailyChallenge.points)||0)+(correct?q.points:0);
+    if(correct)data.dailyBonusPoints=(Number(data.dailyBonusPoints)||0)+q.points;
     data.answers.push({id:"daily-"+id+"-"+localDateKey(),subject:q.subject,topic:q.topic,correct,date:localDateKey()});
     if(!correct){
       const topic=data.topics.find(item=>item.subject===q.subject&&item.title===q.topic);
