@@ -550,7 +550,7 @@
     const correct=answers.filter(item=>item&&item.correct).length;
     const quizzes=Array.isArray(progress.quizHistory)?progress.quizHistory.length:0;
     const cards=progress.cardProgress&&typeof progress.cardProgress==="object"?Object.values(progress.cardProgress).filter(item=>item&&item.known).length:0;
-    return correct*10+quizzes*5+cards*2;
+    const dailyBonus=progress.dailyChallenge&&Array.isArray(progress.dailyChallenge.completed)?progress.dailyChallenge.completed.reduce((sum,item)=>sum+(item&&item.correct?Number(item.points)||0:0),0):0;\n    return correct*10+quizzes*5+cards*2+dailyBonus;
   }
   function scheduleCloudSave() {
     if(!cloud)return;
@@ -631,35 +631,58 @@
   if(cloud)cloud.auth.onAuthStateChange((event)=>{if(event==="SIGNED_IN"||event==="TOKEN_REFRESHED"||event==="SIGNED_OUT")refreshAccountUI();});
 
 
+  const advancedDailyBank = {
+    "Русский язык": [
+      {id:"dr1",subject:"Русский язык",topic:"Пунктуация · сложное предложение",difficulty:4,points:30,q:"Расставь знаки препинания: «Когда рассвело (1) мы вышли к реке (2) и (3) хотя было холодно (4) продолжили путь». Где нужны запятые?",options:["1, 2, 3","1, 3, 4","1, 2, 4","2, 3, 4"],answer:1,explain:"Запятая 1 закрывает придаточную часть времени. Между однородными сказуемыми «вышли» и «продолжили» запятая не ставится, потому что они соединены одиночным «и». Придаточная уступки «хотя было холодно» выделяется с двух сторон: 3 и 4."},
+      {id:"dr2",subject:"Русский язык",topic:"Орфография · НЕ с разными частями речи",difficulty:3,points:20,q:"В каком предложении НЕ со словом пишется раздельно?",options:["Это была (не)лёгкая задача.","Решение ещё (не)проверено учителем.","Он отвечал (не)уверенно.","Мы увидели (не)большой дом."],answer:1,explain:"«Не проверено» — краткое страдательное причастие; с краткими причастиями НЕ пишется раздельно. В остальных вариантах возможно слитное написание."},
+      {id:"dr3",subject:"Русский язык",topic:"Грамматические нормы",difficulty:4,points:30,q:"Выбери предложение без грамматической ошибки.",options:["По приезду в город мы сразу пошли в музей.","Согласно расписания поезд отправляется в семь.","Те, кто пришёл раньше, заняли места.","Более красивее этого здания я не видел."],answer:2,explain:"В варианте 3 правильно согласованы подлежащее «те» и сказуемое «заняли». Нормативно: «по приезде», «согласно расписанию», «более красивое» или «красивее»."},
+      {id:"dr4",subject:"Русский язык",topic:"Пунктуация · причастный оборот",difficulty:5,points:40,q:"Укажи предложение, в котором причастный оборот обособляется правильно.",options:["Освещённая луной дорога казалась серебряной.","Дорога освещённая луной казалась серебряной.","Дорога, освещённая луной, казалась серебряной.","Дорога освещённая, луной казалась серебряной."],answer:2,explain:"Причастный оборот стоит после определяемого слова «дорога», поэтому выделяется запятыми с двух сторон."}
+    ],
+    "Математика": [
+      {id:"dm1",subject:"Математика",topic:"Логарифмические уравнения",difficulty:5,points:50,q:"Реши уравнение log₂(x − 1) + log₂(x + 1) = 3. Найди корень.",options:["x = 3","x = −3","x = 4","x = 5"],answer:0,explain:"ОДЗ: x>1. Объединяем логарифмы: log₂((x−1)(x+1))=3. Тогда x²−1=8, x²=9. С учётом ОДЗ подходит только x=3."},
+      {id:"dm2",subject:"Математика",topic:"Тригонометрические уравнения",difficulty:4,points:40,q:"Сколько корней имеет уравнение sin x = √3/2 на отрезке [0; 2π]?",options:["1","2","3","4"],answer:1,explain:"На отрезке [0; 2π] синус равен √3/2 при x=π/3 и x=2π/3. Всего два корня."},
+      {id:"dm3",subject:"Математика",topic:"Вероятность · независимые испытания",difficulty:4,points:40,q:"В коробке 5 красных и 4 синих шара. Два шара достают подряд без возвращения. Какова вероятность, что оба красные?",options:["5/18","5/9","1/4","2/9"],answer:0,explain:"Вероятность первого красного — 5/9. После этого остаётся 4 красных из 8 шаров: 4/8. Произведение: 5/9 · 4/8 = 5/18."},
+      {id:"dm4",subject:"Математика",topic:"Производная · экстремумы",difficulty:5,points:50,q:"Найди абсциссу точки минимума функции f(x)=x³−3x²−9x+4.",options:["−1","1","3","−3"],answer:2,explain:"f'(x)=3x²−6x−9=3(x−3)(x+1). Производная меняет знак с минуса на плюс при x=3, значит там минимум. При x=−1 знак меняется с плюса на минус — это максимум."}
+    ],
+    "Информатика": [
+      {id:"di1",subject:"Информатика",topic:"Python · анализ циклов",difficulty:4,points:40,q:"Что выведет программа? s=0; for i in range(1,6):\n    for j in range(i):\n        s += i-j\nprint(s)",options:["25","30","35","40"],answer:2,explain:"Для каждого i внутренняя сумма равна i+(i−1)+...+1. Получаем 1+3+6+10+15=35."},
+      {id:"di2",subject:"Информатика",topic:"Системы счисления · двоичная запись",difficulty:4,points:40,q:"Сколько единиц содержит двоичная запись числа 255₁₀?",options:["6","7","8","9"],answer:2,explain:"255₁₀ = 11111111₂, поскольку 255 = 2⁸−1. В записи восемь единиц."},
+      {id:"di3",subject:"Информатика",topic:"Python · списки и условия",difficulty:5,points:50,q:"Что выведет код? a=[3, 8, 5, 2, 9]; print(sum(x for x in a if x%2==1))",options:["13","15","17","19"],answer:2,explain:"Условию x%2==1 соответствуют 3, 5 и 9. Их сумма равна 17."},
+      {id:"di4",subject:"Информатика",topic:"Логика · таблицы истинности",difficulty:5,points:50,q:"При каких значениях A и B выражение (A → B) И НЕ B истинно?",options:["A=0, B=0","A=0, B=1","A=1, B=0","A=1, B=1"],answer:0,explain:"НЕ B требует B=0. Тогда импликация A→0 истинна только при A=0. Подходит единственная пара A=0, B=0."}
+    ]
+  };
+
   function dailyQuestions() {
-    const day=localDateKey();
-    const subjects=["Русский язык","Математика","Информатика"];
-    return subjects.map(subject=>{
-      const list=questionBank.filter(q=>q.subject===subject);
-      const seed=day.split("-").join("")+subject.length*17;
-      const index=Array.from(seed).reduce((sum,ch)=>sum+ch.charCodeAt(0),0)%list.length;
-      return list[index];
+    const now = new Date();
+    const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    return ["Русский язык","Математика","Информатика"].map((subject, offset) => {
+      const list = advancedDailyBank[subject];
+      return list[(dayNumber + offset * 2) % list.length];
     });
   }
+
   function renderDailyChallenge() {
     const host=$("#daily-challenge-list"); if(!host)return;
     const tasks=dailyQuestions(),day=localDateKey();
-    if(!data.dailyChallenge||data.dailyChallenge.date!==day)data.dailyChallenge={date:day,completed:[]};
+    if(!data.dailyChallenge||data.dailyChallenge.date!==day)data.dailyChallenge={date:day,completed:[],points:0};
+    if(!Array.isArray(data.dailyChallenge.completed))data.dailyChallenge.completed=[];
     $("#daily-date-label").textContent=new Date().toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();
-    $("#daily-challenge-count").textContent=data.dailyChallenge.completed.length+" / 3 выполнено";
+    const earned=Number(data.dailyChallenge.points)||0;
+    $("#daily-challenge-count").textContent=data.dailyChallenge.completed.length+" / 3 · "+earned+" бонусных баллов";
     host.innerHTML=tasks.map((q,index)=>{
       const result=data.dailyChallenge.completed.find(item=>item.id===q.id);
       const options=q.options.map((option,i)=>'<button class="daily-option '+(result?(i===q.answer?"correct":i===result.choice?"incorrect":""):"")+'" data-daily-id="'+q.id+'" data-daily-choice="'+i+'" '+(result?"disabled":"")+'><span>'+String.fromCharCode(65+i)+'</span>'+escapeHtml(option)+'</button>').join("");
-      return '<article class="daily-task-card"><div class="daily-task-top"><span>'+escapeHtml(q.subject)+'</span><b>0'+(index+1)+'</b></div><p>'+escapeHtml(q.topic)+'</p><h3>'+escapeHtml(q.q)+'</h3><div class="daily-options">'+options+'</div>'+(result?'<div class="daily-explanation '+(result.correct?"good":"bad")+'"><strong>'+(result.correct?"Верно":"Разберём ошибку")+'</strong><p>'+escapeHtml(q.explain)+'</p></div>':'<small class="daily-prompt">Выбери ответ — объяснение появится сразу.</small>')+'</article>';
+      return '<article class="daily-task-card"><div class="daily-task-top"><span>'+escapeHtml(q.subject)+'</span><b>0'+(index+1)+'</b></div><p>'+escapeHtml(q.topic)+'</p><div class="daily-difficulty">Сложность '+q.difficulty+'/5 · '+q.points+' бонусных баллов</div><h3>'+escapeHtml(q.q).replace(/\\n/g,"<br>")+'</h3><div class="daily-options">'+options+'</div>'+(result?'<div class="daily-explanation '+(result.correct?"good":"bad")+'"><strong>'+(result.correct?"Верно · +"+q.points+" баллов":"Разберём ошибку")+'</strong><p>'+escapeHtml(q.explain)+'</p></div>':'<small class="daily-prompt">Сначала реши самостоятельно. Баллы начисляются за правильный ответ.</small>')+'</article>';
     }).join("");
     saveData();
   }
   $("#daily-challenge-list").addEventListener("click",event=>{
     const button=event.target.closest("[data-daily-choice]");if(!button)return;
-    const id=button.dataset.dailyId,choice=Number(button.dataset.dailyChoice),q=questionBank.find(item=>item.id===id);
+    const id=button.dataset.dailyId,choice=Number(button.dataset.dailyChoice),q=Object.values(advancedDailyBank).flat().find(item=>item.id===id);
     if(!q||data.dailyChallenge.completed.some(item=>item.id===id))return;
     const correct=choice===q.answer;
-    data.dailyChallenge.completed.push({id,choice,correct});
+    data.dailyChallenge.completed.push({id,choice,correct,points:correct?q.points:0});
+    data.dailyChallenge.points=(Number(data.dailyChallenge.points)||0)+(correct?q.points:0);
     data.answers.push({id:"daily-"+id+"-"+localDateKey(),subject:q.subject,topic:q.topic,correct,date:localDateKey()});
     if(!correct){
       const topic=data.topics.find(item=>item.subject===q.subject&&item.title===q.topic);
